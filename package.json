@@ -1,0 +1,40 @@
+{
+  "name": "@osjs/cli",
+  "version": "3.0.0-alpha.1",
+  "description": "OS.js v3 CLI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osjs/osjs-cli.git"
+  },
+  "keywords": [
+    "osjs"
+  ],
+  "dependencies": {
+    "@babel/core": "^7.0.0-beta.38",
+    "@babel/plugin-transform-runtime": "^7.0.0-beta.38",
+    "@babel/preset-env": "^7.0.0-beta.38",
+    "@babel/runtime": "^7.0.0-beta.38",
+    "babel-loader": "^7.1.2",
+    "css-loader": "^0.28.9",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^1.1.6",
+    "globby": "^8.0.1",
+    "html-webpack-plugin": "^2.30.1",
+    "minimist": "^1.2.0",
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.20.1",
+    "webpack": "^3.11.0"
+  },
+  "devDependencies": {},
+  "author": "Anders Evenrud <andersevenrud@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/osjs/osjs-cli/issues"
+  },
+  "homepage": "https://github.com/osjs/osjs-cli#readme"
+}
