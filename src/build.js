@@ -37,7 +37,10 @@ const cliRoot = path.dirname(__dirname);
 
 const baseWebpackConfiguration = (dir, options = {}) => {
   options = Object.assign({
+    mode: 'development',
     context: dir,
+    splitChunks: false,
+    runtimeChunk: false,
     title: 'OS.js',
     template: null,
     minimize: false,
@@ -73,6 +76,7 @@ const baseWebpackConfiguration = (dir, options = {}) => {
   }
 
   const defaults = {
+    mode: options.mode,
     devtool: options.devtool,
     context: options.context,
     plugins: [
@@ -80,6 +84,11 @@ const baseWebpackConfiguration = (dir, options = {}) => {
       ...options.plugins
     ],
     entry: options.entry,
+    optimization: {
+      minimize: options.minimize,
+      splitChunks: options.splitChunks,
+      runtimeChunk: options.runtimeChunk
+    },
     output: {
       path: options.outputPath,
       sourceMapFilename: '[file].map',
@@ -133,13 +142,6 @@ const baseWebpackConfiguration = (dir, options = {}) => {
       ]
     }
   };
-
-  if (options.minimize) {
-    defaults.plugins.push(new webpack.optimize.UglifyJsPlugin({
-      minimize: options.minimize,
-      sourceMap: options.sourceMap
-    }));
-  }
 
   if (options.template) {
     defaults.plugins.push(new HtmlWebpackPlugin(htmlOptions));
