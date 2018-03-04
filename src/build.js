@@ -36,9 +36,11 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const cliRoot = path.dirname(__dirname);
 
 const baseWebpackConfiguration = (dir, options = {}) => {
+  const realDir = fs.realpathSync(dir);
+
   options = Object.assign({
     mode: 'development',
-    context: dir,
+    context: realDir,
     splitChunks: false,
     runtimeChunk: false,
     title: 'OS.js',
@@ -58,7 +60,7 @@ const baseWebpackConfiguration = (dir, options = {}) => {
       ]
     },
     includePaths: [
-      path.resolve(dir, 'node_modules'),
+      path.resolve(realDir, 'node_modules'),
       path.resolve(cliRoot, 'node_modules')
     ]
   }, options);
@@ -152,7 +154,7 @@ const baseWebpackConfiguration = (dir, options = {}) => {
 
 const packageWebpackConfiguration = (dir, args, options = {}) =>
   baseWebpackConfiguration(dir, Object.assign({
-    outputPath: path.resolve(args.publicPath, 'packages', path.basename(dir)),
+    outputPath: path.resolve(args.publicPath, 'packages', path.basename(dir))
   }, options));
 
 const logger = (err, status, cb) => {
