@@ -28,13 +28,13 @@
  * @licence Simplified BSD License
  */
 
+const webpack = require('webpack');
 const cli = require('./src/cli.js');
 
 const {
   baseWebpackConfiguration,
   packageWebpackConfiguration,
-  webpack
-} = require('./src/build.js');
+} = require('./src/webpack.js');
 
 module.exports = {
   production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
