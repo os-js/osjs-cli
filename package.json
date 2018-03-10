@@ -27,7 +27,7 @@
     "minimist": "^1.2.0",
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.7",
-    "style-loader": "^0.20.1",
+    "style-loader": "^0.20.3",
     "webpack": "^4.1.1"
   },
   "devDependencies": {},
