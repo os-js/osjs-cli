@@ -99,7 +99,7 @@ const baseWebpackConfiguration = (dir, options = {}) => {
     module: {
       rules: [
         {
-          test: /\.(png|jpg|gif)$/,
+          test: /\.(png|jpe?g|gif|webp)$/,
           use: [
             {
               loader: require.resolve('file-loader'),
@@ -139,6 +139,15 @@ const baseWebpackConfiguration = (dir, options = {}) => {
           use: {
             loader: require.resolve('babel-loader'),
             options: options.babel
+          }
+        },
+        {
+          test: /\.(eot|svg|ttf|woff|woff2)$/,
+          use: {
+            loader: require.resolve('file-loader'),
+            options: {
+              name: 'fonts/[name].[ext]'
+            }
           }
         }
       ]
