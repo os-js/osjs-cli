@@ -33,6 +33,7 @@ const path = require('path');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const cliRoot = path.dirname(__dirname);
 
 const baseWebpackConfiguration = (dir, options = {}) => {
@@ -52,6 +53,7 @@ const baseWebpackConfiguration = (dir, options = {}) => {
     outputPath: path.resolve(dir, 'dist'),
     entry: {},
     plugins: [],
+    copy: [],
     babel: {
       cacheDirectory: true,
       presets: ['@babel/preset-env'],
@@ -83,6 +85,7 @@ const baseWebpackConfiguration = (dir, options = {}) => {
     context: options.context,
     plugins: [
       new ExtractTextPlugin('[name].css'),
+      new CopyWebpackPlugin(options.copy),
       ...options.plugins
     ],
     entry: options.entry,
