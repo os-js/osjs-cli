@@ -51,8 +51,10 @@ const watch = (configurations, options, cb) => webpack(configurations)
   .watch(options, (err, status) => logger(err, status, cb));
 
 const buildManifest = (dir, data, options = []) => {
+  const valid = [].concat(data); // TODO
   const json = JSON.stringify(data);
-  return fs.writeFileSync(dir, json);
+  fs.writeFileSync(dir, json);
+  return valid;
 };
 
 module.exports = {

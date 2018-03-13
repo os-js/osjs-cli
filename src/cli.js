@@ -32,6 +32,7 @@ const path = require('path');
 const utils = require('./utils.js');
 const builder = require('./build.js')
 const minimist = require('minimist');
+const symbols = require('log-symbols');
 
 const getPublicPath = options => path.resolve(options.root, 'dist');
 
@@ -48,19 +49,20 @@ const cli = async (argv, options) => {
     publicPath: options.publicPath
   });
 
-  const pkgManifests = await utils.manifests(options.packages);
-
   const configuration = require(options.config);
   const configurations = [configuration, ...pkgConfigurations];
 
   if (args.manifest) {
-    console.log('Making manifest');
+    console.log(symbols.info, 'Making manifest');
+    const pkgManifests = await utils.manifests(options.packages);
+    pkgManifests.forEach((metadata) => console.log(symbols.success, `${metadata.name} (${metadata._path})`));
+
     builder.buildManifest(options.metaPath, pkgManifests);
   } else if (args.watch) {
-    console.log('Watching');
+    console.log(symbols.info, 'Watching');
     builder.watch(configurations);
   } else {
-    console.log('Building'), configurations.join(', ');
+    console.log(symbols.info, 'Building'), configurations.join(', ');
     builder.build(configurations);
   }
 };
