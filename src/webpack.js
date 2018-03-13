@@ -146,11 +146,19 @@ const baseWebpackConfiguration = (dir, options = {}) => {
         },
         {
           test: /\.(eot|svg|ttf|woff|woff2)$/,
+          include: /typeface/,
           use: {
             loader: require.resolve('file-loader'),
             options: {
               name: 'fonts/[name].[ext]'
             }
+          }
+        },
+        {
+          test: /\.svg$/,
+          exclude: /typeface/,
+          use: {
+            loader: require.resolve('file-loader')
           }
         }
       ]
