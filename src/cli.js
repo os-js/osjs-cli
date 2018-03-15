@@ -34,17 +34,31 @@ const builder = require('./build.js')
 const minimist = require('minimist');
 const symbols = require('log-symbols');
 
-const getPublicPath = options => path.resolve(options.root, 'dist');
+const createWebpackOptions = (options) => ({
+});
 
 const tasks = {
-  'build:manifest': async ({options, args, configurations}) => {
+  'build:manifest': async ({options, args}) => {
     console.log(symbols.info, 'Making manifest');
+
     const pkgManifests = await utils.manifests(options.packages);
+
     pkgManifests.forEach((metadata) => console.log(symbols.success, `${metadata.name} (${metadata._path})`));
+
     builder.buildManifest(options.metaPath, pkgManifests);
   },
 
-  'build:dist': async ({options, args, configurations}) => {
+  'build:dist': async ({options, args}) => {
+    const publicPath = path.resolve(options.root, 'dist');
+
+    const coreConfig = require(options.config);
+
+    const pkgConfig = await utils.packages(options.packages, {
+      publicPath
+    });
+
+    const configurations = [coreConfig, ...pkgConfig];
+
     if (args.watch) {
       console.log(symbols.info, 'Watching');
       builder.watch(configurations);
@@ -59,21 +73,14 @@ const cli = async (argv, options) => {
   const args = minimist(argv);
   const [arg] = args._;
 
-  options = Object.assign({
+  options = Object.assign({}, {
     config: path.resolve(options.root, 'src/conf/webpack.config.js'),
-    publicPath: getPublicPath(options),
-    metaPath: path.resolve(getPublicPath(options), 'metadata.json')
+    packages: path.resolve(options.root, 'src/packages'),
+    metaPath: path.resolve(options.root, 'dist/metadata.json')
   }, options);
 
-  const pkgConfigurations = await utils.packages(options.packages, {
-    publicPath: options.publicPath
-  });
-
-  const configuration = require(options.config);
-  const configurations = [configuration, ...pkgConfigurations];
-
   if (arg in tasks) {
-    tasks[arg]({options, args, configurations});
+    tasks[arg]({options, args});
   } else {
     console.error('Invalid command', arg);
     process.exit(1);
