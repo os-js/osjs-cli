@@ -36,8 +36,28 @@ const symbols = require('log-symbols');
 
 const getPublicPath = options => path.resolve(options.root, 'dist');
 
+const tasks = {
+  'build:manifest': async ({options, args, configurations}) => {
+    console.log(symbols.info, 'Making manifest');
+    const pkgManifests = await utils.manifests(options.packages);
+    pkgManifests.forEach((metadata) => console.log(symbols.success, `${metadata.name} (${metadata._path})`));
+    builder.buildManifest(options.metaPath, pkgManifests);
+  },
+
+  'build:dist': async ({options, args, configurations}) => {
+    if (args.watch) {
+      console.log(symbols.info, 'Watching');
+      builder.watch(configurations);
+    } else {
+      console.log(symbols.info, 'Building'), configurations.join(', ');
+      builder.build(configurations);
+    }
+  }
+};
+
 const cli = async (argv, options) => {
   const args = minimist(argv);
+  const [arg] = args._;
 
   options = Object.assign({
     config: path.resolve(options.root, 'src/conf/webpack.config.js'),
@@ -52,18 +72,11 @@ const cli = async (argv, options) => {
   const configuration = require(options.config);
   const configurations = [configuration, ...pkgConfigurations];
 
-  if (args.manifest) {
-    console.log(symbols.info, 'Making manifest');
-    const pkgManifests = await utils.manifests(options.packages);
-    pkgManifests.forEach((metadata) => console.log(symbols.success, `${metadata.name} (${metadata._path})`));
-
-    builder.buildManifest(options.metaPath, pkgManifests);
-  } else if (args.watch) {
-    console.log(symbols.info, 'Watching');
-    builder.watch(configurations);
+  if (arg in tasks) {
+    tasks[arg]({options, args, configurations});
   } else {
-    console.log(symbols.info, 'Building'), configurations.join(', ');
-    builder.build(configurations);
+    console.error('Invalid command', arg);
+    process.exit(1);
   }
 };
 
