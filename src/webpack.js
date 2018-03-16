@@ -61,10 +61,7 @@ const baseWebpackConfiguration = (dir, options = {}) => {
         '@babel/transform-runtime'
       ]
     },
-    includePaths: [
-      path.resolve(realDir, 'node_modules'),
-      path.resolve(cliRoot, 'node_modules')
-    ]
+    includePaths: []
   }, options);
 
   if (!options.sourceMap) {
@@ -129,7 +126,11 @@ const baseWebpackConfiguration = (dir, options = {}) => {
                 options: {
                   minimize: options.minimize,
                   sourceMap: options.sourceMap,
-                  includePaths: options.includePaths
+                  includePaths: [
+                    ...options.includePaths,
+                    path.resolve(realDir, 'node_modules'),
+                    path.resolve(cliRoot, 'node_modules')
+                  ]
                 }
               }
             ]
@@ -138,7 +139,11 @@ const baseWebpackConfiguration = (dir, options = {}) => {
         {
           test: /\.js$/,
           exclude: options.exclude,
-          include: options.includePaths,
+          include: [
+            ...options.includePaths,
+            path.resolve(realDir, 'node_modules'),
+            path.resolve(cliRoot, 'node_modules')
+          ],
           use: {
             loader: require.resolve('babel-loader'),
             options: options.babel
