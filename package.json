@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/osjs/osjs-cli.git"
+    "url": "git+https://github.com/os-js/osjs-cli.git"
   },
   "keywords": [
     "osjs"
@@ -39,7 +39,7 @@
   "author": "Anders Evenrud <andersevenrud@gmail.com>",
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/osjs/osjs-cli/issues"
+    "url": "https://github.com/os-js/osjs-cli/issues"
   },
-  "homepage": "https://github.com/osjs/osjs-cli#readme"
+  "homepage": "https://github.com/os-js/osjs-cli#readme"
 }
