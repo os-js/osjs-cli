@@ -38,15 +38,13 @@ const manifests = async(dir, options = {}) => {
   return paths.map(p => {
     const meta = require(p);
     const appFolder = path.basename(
-      path.dirname(p)
-      /*
       fs.realpathSync(
         path.dirname(p)
       )
-      */
     );
 
     return Object.assign({
+      _basename: path.basename(path.dirname(p)),
       _path: appFolder
     }, meta);
   });

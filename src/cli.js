@@ -64,7 +64,7 @@ const tasks = {
     if (!args.core || packageOnly) {
       const pkgs = (await utils.manifests(options.packages))
         .filter(packageFilter)
-        .map(meta => require(`${options.packages}/${meta._path}/webpack.js`)({
+        .map(meta => require(`${options.packages}/${meta._basename}/webpack.js`)({
           publicPath
         }));
 
