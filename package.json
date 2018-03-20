@@ -14,7 +14,8 @@
     "osjs"
   ],
   "bin": {
-    "osjs-cli": "bin/cli.js"
+    "osjs-cli": "bin/cli.js",
+    "osjs-install-package": "bin/install.sh"
   },
   "dependencies": {
     "@babel/core": "^7.0.0-beta.38",
