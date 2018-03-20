@@ -75,7 +75,7 @@ const tasks = {
       console.log(symbols.info, 'Watching');
       builder.watch(webpacks);
     } else {
-      console.log(symbols.info, 'Building'), webpacks.join(', ');
+      console.log(symbols.info, 'Building');
       builder.build(webpacks);
     }
   }
