@@ -34,9 +34,6 @@ const builder = require('./build.js')
 const minimist = require('minimist');
 const symbols = require('log-symbols');
 
-const createWebpackOptions = (options) => ({
-});
-
 const tasks = {
   'build:manifest': async ({options, args}) => {
     console.log(symbols.info, 'Making manifest');
@@ -50,21 +47,36 @@ const tasks = {
 
   'build:dist': async ({options, args}) => {
     const publicPath = path.resolve(options.root, 'dist');
+    let webpacks = [];
 
-    const coreConfig = require(options.config);
+    const packageOnly = !!(args.package || args.packages);
+    if (args.core || !packageOnly) {
+      const coreConfig = require(options.config);
+      webpacks.push(coreConfig);
+    }
 
-    const pkgConfig = await utils.packages(options.packages, {
-      publicPath
-    });
+    const packageFilter = packageOnly
+      ? (args.packages
+          ? meta => args.packages.indexOf(meta.name) !== -1
+          : meta => meta.name === args.package)
+      : meta => true;
 
-    const configurations = [coreConfig, ...pkgConfig];
+    if (!args.core || packageOnly) {
+      const pkgs = (await utils.manifests(options.packages))
+        .filter(packageFilter)
+        .map(meta => require(`${options.packages}/${meta._path}/webpack.js`)({
+          publicPath
+        }));
+
+      webpacks = webpacks.concat(pkgs);
+    }
 
     if (args.watch) {
       console.log(symbols.info, 'Watching');
-      builder.watch(configurations);
+      builder.watch(webpacks);
     } else {
-      console.log(symbols.info, 'Building'), configurations.join(', ');
-      builder.build(configurations);
+      console.log(symbols.info, 'Building'), webpacks.join(', ');
+      builder.build(webpacks);
     }
   }
 };

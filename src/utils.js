@@ -32,19 +32,18 @@ const globby = require('globby');
 const path = require('path');
 const fs = require('fs');
 
-const packages = async (dir, options = {}) => {
-  const paths = await globby(dir + '/*/webpack.js');
-  return paths.map(p => require(p)(options));
-};
-
 const manifests = async(dir, options = {}) => {
   const paths = await globby(dir + '/*/metadata.json');
+
   return paths.map(p => {
     const meta = require(p);
     const appFolder = path.basename(
+      path.dirname(p)
+      /*
       fs.realpathSync(
         path.dirname(p)
       )
+      */
     );
 
     return Object.assign({
@@ -54,6 +53,5 @@ const manifests = async(dir, options = {}) => {
 };
 
 module.exports = {
-  manifests,
-  packages
+  manifests
 };
