@@ -40,9 +40,9 @@ const tasks = {
 
     const pkgManifests = await utils.manifests(options.packages);
 
-    pkgManifests.forEach((metadata) => console.log(symbols.success, `${metadata.name} (${metadata._path})`));
+    pkgManifests.forEach((metadata) => console.log(symbols.success, `${metadata.name}`));
 
-    builder.buildManifest(options.metaPath, pkgManifests);
+    builder.buildManifest(options.dist.metadata, pkgManifests);
   },
 
   'build:dist': async ({options, args}) => {
@@ -64,9 +64,7 @@ const tasks = {
     if (!args.core || packageOnly) {
       const pkgs = (await utils.manifests(options.packages))
         .filter(packageFilter)
-        .map(meta => require(`${options.packages}/${meta._basename}/webpack.js`)({
-          publicPath
-        }));
+        .map(meta => require(`${options.packages}/${meta._basename}/webpack.js`)(options));
 
       webpacks = webpacks.concat(pkgs);
     }
@@ -86,9 +84,13 @@ const cli = async (argv, options) => {
   const [arg] = args._;
 
   options = Object.assign({}, {
+    production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
     config: path.resolve(options.root, 'src/conf/webpack.config.js'),
     packages: path.resolve(options.root, 'src/packages'),
-    metaPath: path.resolve(options.root, 'dist/metadata.json')
+    dist: {
+      packages: path.resolve(options.root, 'dist/packages'),
+      metadata: path.resolve(options.root, 'dist/metadata.json')
+    }
   }, options);
 
   if (arg in tasks) {

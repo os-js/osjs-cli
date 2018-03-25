@@ -30,16 +30,6 @@
 
 const webpack = require('webpack');
 const cli = require('./src/cli.js');
+const {createWebpack} = require('./src/webpack.js')
 
-const {
-  baseWebpackConfiguration,
-  packageWebpackConfiguration,
-} = require('./src/webpack.js');
-
-module.exports = {
-  production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
-  packageWebpackConfiguration,
-  baseWebpackConfiguration,
-  webpack,
-  cli
-};
+module.exports = {createWebpack, webpack, cli};

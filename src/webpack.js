@@ -35,8 +35,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const cliRoot = path.dirname(__dirname);
+const production = !!(process.env.NODE_ENV || 'development').match(/^prod/);
 
-const baseWebpackConfiguration = (dir, options = {}) => {
+const createWebpack = (dir, options = {}) => {
   const realDir = fs.realpathSync(dir);
 
   options = Object.assign({
@@ -46,8 +47,8 @@ const baseWebpackConfiguration = (dir, options = {}) => {
     runtimeChunk: false,
     title: 'OS.js',
     template: null,
-    minimize: false,
-    sourceMap: true,
+    minimize: production,
+    sourceMap: production,
     devtool: 'source-map',
     exclude: /(node_modules|bower_components)/,
     outputPath: path.resolve(dir, 'dist'),
@@ -177,12 +178,4 @@ const baseWebpackConfiguration = (dir, options = {}) => {
   return defaults;
 };
 
-const packageWebpackConfiguration = (dir, args, options = {}) =>
-  baseWebpackConfiguration(dir, Object.assign({
-    outputPath: path.resolve(args.publicPath, 'packages', path.basename(dir))
-  }, options));
-
-module.exports = {
-  baseWebpackConfiguration,
-  packageWebpackConfiguration
-};
+module.exports = {createWebpack};
