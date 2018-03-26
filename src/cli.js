@@ -57,7 +57,7 @@ const tasks = {
 
     const packageFilter = packageOnly
       ? (args.packages
-          ? meta => args.packages.indexOf(meta.name) !== -1
+          ? meta => args.packages === '*' || args.packages.indexOf(meta.name) !== -1
           : meta => meta.name === args.package)
       : meta => true;
 
