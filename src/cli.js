@@ -74,7 +74,10 @@ const tasks = {
     }
 
     if (args.watch) {
-      console.log(symbols.info, 'Watching');
+      console.log(symbols.info, 'Watching', {
+        aggregateTimeout: 250,
+        ignored: /node_modules/
+      });
       builder.watch(webpacks);
     } else {
       console.log(symbols.info, 'Building');
