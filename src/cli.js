@@ -28,6 +28,7 @@
  * @licence Simplified BSD License
  */
 
+const os = require('os');
 const path = require('path');
 const utils = require('./utils.js');
 const builder = require('./build.js')
@@ -48,6 +49,9 @@ const tasks = {
   'build:dist': async ({options, args}) => {
     const publicPath = path.resolve(options.root, 'dist');
     let webpacks = [];
+
+    console.log(symbols.info, 'Starting build process....');
+    console.log(`platform: ${os.platform()} (${os.release()}) arch: ${os.arch()} cpus: ${os.cpus().length} mem: ${os.totalmem()}`);
 
     const packageOnly = !!(args.package || args.packages);
     if (args.core || !packageOnly) {
