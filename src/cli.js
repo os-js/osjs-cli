@@ -51,7 +51,7 @@ const tasks = {
     let webpacks = [];
 
     console.log(symbols.info, 'Starting build process....');
-    console.log(`platform: ${os.platform()} (${os.release()}) arch: ${os.arch()} cpus: ${os.cpus().length} mem: ${os.totalmem()}`);
+    console.log(`platform: ${os.platform()} (${os.release()}) arch: ${os.arch()} cpus: ${os.cpus().length} mem: ${os.totalmem()} node: ${process.versions.node}`);
 
     const packageOnly = !!(args.package || args.packages);
     if (args.core || !packageOnly) {
