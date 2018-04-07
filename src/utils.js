@@ -32,14 +32,15 @@ const globby = require('globby');
 const path = require('path');
 const fs = require('fs');
 
-const manifests = async(dir, options = {}) => {
+const manifests = async(dir) => {
   const paths = await globby(dir + '/*/metadata.json');
 
   return paths.map(p => {
     const meta = require(p);
     return Object.assign({
       _basename: path.basename(path.dirname(p)),
-      _path: meta.name
+      _path: meta.name,
+      type: 'application',
     }, meta);
   });
 };

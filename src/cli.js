@@ -39,11 +39,11 @@ const tasks = {
   'build:manifest': async ({options, args}) => {
     console.log(symbols.info, 'Making manifest');
 
-    const pkgManifests = await utils.manifests(options.packages);
+    const packages = await utils.manifests(options.packages);
 
-    pkgManifests.forEach((metadata) => console.log(symbols.success, `${metadata.name}`));
+    packages.forEach(m => console.log(symbols.success, `${m.name} (${m.type})`));
 
-    builder.buildManifest(options.dist.metadata, pkgManifests);
+    builder.buildManifest(options.dist.metadata, packages);
   },
 
   'build:dist': async ({options, args}) => {
@@ -53,24 +53,47 @@ const tasks = {
     console.log(symbols.info, 'Starting build process....');
     console.log(`platform: ${os.platform()} (${os.release()}) arch: ${os.arch()} cpus: ${os.cpus().length} mem: ${os.totalmem()} node: ${process.versions.node}`);
 
-    const packageOnly = !!(args.package || args.packages);
-    if (args.core || !packageOnly) {
+    const packages = await utils.manifests(options.packages);
+
+    const concat = list => {
+      if (list.length) {
+        console.log('Including:');
+        list.forEach(p => console.log(`- ${p.name} (${p.type})`));
+
+        const load = p => require(`${options.packages}/${p._basename}/webpack.js`)(options);
+        webpacks = webpacks.concat(list.map(load));
+      }
+    };
+
+    const buildEverything = [args.core, args.application, args.applications, args.themes]
+      .every(val => typeof val === 'undefined');
+
+    const buildApplications = buildEverything || !!(args.application || args.applications);
+    const buildThemes = buildEverything || !!args.themes;
+    const buildCore = buildEverything || !!args.core;
+
+    if (buildCore) {
       const coreConfig = require(options.config);
       webpacks.push(coreConfig);
     }
 
-    const packageFilter = packageOnly
-      ? (args.packages
-          ? meta => args.packages === '*' || args.packages.indexOf(meta.name) !== -1
-          : meta => meta.name === args.package)
-      : meta => true;
+    if (buildApplications) {
+      const filter = buildEverything ? meta => true : args.applications
+        ? meta => args.applications === '*' || args.applications.indexOf(meta.name) !== -1
+        : meta => meta.name === args.application;
 
-    if (!args.core || packageOnly) {
-      const pkgs = (await utils.manifests(options.packages))
-        .filter(packageFilter)
-        .map(meta => require(`${options.packages}/${meta._basename}/webpack.js`)(options));
+      const applications = packages
+        .filter(p => p.type === 'application')
+        .filter(filter);
 
-      webpacks = webpacks.concat(pkgs);
+      concat(applications);
+    }
+
+    if (buildThemes) {
+      const themes = packages
+        .filter(p => p.type === 'theme');
+
+      concat(themes);
     }
 
     if (args.watch) {
@@ -95,7 +118,8 @@ const cli = async (argv, options) => {
     config: path.resolve(options.root, 'src/conf/webpack.config.js'),
     packages: path.resolve(options.root, 'src/packages'),
     dist: {
-      packages: path.resolve(options.root, 'dist/packages'),
+      themes: path.resolve(options.root, 'dist/themes'),
+      packages: path.resolve(options.root, 'dist/apps'), // FIXME: Rename to applications
       metadata: path.resolve(options.root, 'dist/metadata.json')
     }
   }, options);
