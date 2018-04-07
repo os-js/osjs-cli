@@ -29,6 +29,7 @@
  */
 
 const fs = require('fs');
+const path = require('path');
 const webpack = require('webpack');
 
 const logger = (err, status, cb) => {
@@ -53,6 +54,9 @@ const watch = (configurations, options, cb) => webpack(configurations)
 const buildManifest = (dir, data, options = []) => {
   const valid = [].concat(data); // TODO
   const json = JSON.stringify(data);
+  if (!fs.existsSync(path.dirname(dir))) {
+    fs.mkdirSync(path.dirname(dir));
+  }
   fs.writeFileSync(dir, json);
   return valid;
 };
