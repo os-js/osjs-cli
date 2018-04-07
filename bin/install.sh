@@ -64,11 +64,7 @@ git clone --recursive $repository $destination
 # Install dependencies
 (cd src/packages/$name && npm install)
 
-# Rebuild manifest
-npm run build:manifest
-
-# Rebuild package
-npm run build:dist -- --package=$name
-
-echo "Done!"
+echo "Done. Remember to run:"
+echo "- 'npm run build:manifest' to update package manifest"
+echo "- 'npm run build:dist' to rebuild sources"
 echo "Note: Some packages use server-side scripts, so you'll have to re-load the OS.js server in these cases."
