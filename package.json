@@ -15,7 +15,7 @@
   ],
   "bin": {
     "osjs-cli": "bin/cli.js",
-    "osjs-install-package": "bin/install.sh"
+    "osjs-install-package": "bin/install.js"
   },
   "engines": {
     "node": ">=8.0"
@@ -35,6 +35,7 @@
     "log-symbols": "^2.2.0",
     "minimist": "^1.2.0",
     "node-sass": "^4.8.3",
+    "request": "^2.85.0",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.20.3",
     "webpack": "^4.5.0"
