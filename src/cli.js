@@ -32,6 +32,7 @@ const os = require('os');
 const path = require('path');
 const utils = require('./utils.js');
 const builder = require('./build.js')
+const webpacker = require('./webpack.js');
 const minimist = require('minimist');
 const symbols = require('log-symbols');
 
@@ -60,7 +61,10 @@ const tasks = {
         console.log('Including:');
         list.forEach(p => console.log(`- ${p.name} (${p.type})`));
 
-        const load = p => require(`${options.packages}/${p._basename}/webpack.js`)(options);
+        const load = p => require(`${options.packages}/${p._basename}/webpack.js`)(
+          options,
+          webpacker
+        );
         webpacks = webpacks.concat(list.map(load));
       }
     };
