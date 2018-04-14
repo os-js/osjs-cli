@@ -46,13 +46,12 @@ const createWebpack = (dir, options = {}) => {
     context: realDir,
     splitChunks: false,
     runtimeChunk: false,
-    title: 'OS.js',
-    template: null,
     minimize: production,
     sourceMap: production,
     devtool: 'source-map',
     exclude: /(node_modules|bower_components)/,
     outputPath: path.resolve(dir, 'dist'),
+    html: {},
     entry: {},
     plugins: [],
     copy: [],
@@ -70,13 +69,10 @@ const createWebpack = (dir, options = {}) => {
     options.devtool = false;
   }
 
-  const htmlOptions = {
-    title: options.title
-  };
-
-  if (options.template) {
-    htmlOptions.template = options.template;
-  }
+  const htmlOptions = Object.assign({}, {
+    template: null,
+    title: 'OS.js'
+  }, options.html);
 
   const defaults = {
     mode: options.mode,
@@ -172,7 +168,7 @@ const createWebpack = (dir, options = {}) => {
     }
   };
 
-  if (options.template) {
+  if (htmlOptions.template) {
     defaults.plugins.push(new HtmlWebpackPlugin(htmlOptions));
   }
 
