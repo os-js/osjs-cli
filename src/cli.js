@@ -83,7 +83,7 @@ const tasks = {
 
     if (buildApplications) {
       const filter = buildEverything ? meta => true : args.applications
-        ? meta => args.applications === '*' || args.applications.indexOf(meta.name) !== -1
+        ? meta => args.applications === '*' || args.applications.split(',').indexOf(meta.name) !== -1
         : meta => meta.name === args.application;
 
       const applications = packages
