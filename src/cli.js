@@ -35,6 +35,7 @@ const builder = require('./build.js')
 const webpacker = require('./webpack.js');
 const minimist = require('minimist');
 const symbols = require('log-symbols');
+const inspect = require('util').inspect;
 
 const tasks = {
   'build:manifest': async ({options, args}) => {
@@ -98,6 +99,10 @@ const tasks = {
         .filter(p => p.type === 'theme');
 
       concat(themes);
+    }
+
+    if (args['dump-webpack']) {
+      webpacks.forEach(w => console.log(inspect(w, {depth: null})));
     }
 
     if (args.watch) {
