@@ -126,8 +126,6 @@ const createWebpack = (dir, options = {}) => {
                   sourceMap: options.sourceMap,
                   includePaths: [
                     ...options.includePaths,
-                    path.resolve(realDir, 'node_modules'),
-                    path.resolve(cliRoot, 'node_modules')
                   ]
                 }
               }
@@ -139,8 +137,6 @@ const createWebpack = (dir, options = {}) => {
           exclude: options.exclude,
           include: [
             ...options.includePaths,
-            path.resolve(realDir, 'node_modules'),
-            path.resolve(cliRoot, 'node_modules')
           ],
           use: {
             loader: require.resolve('babel-loader'),
