@@ -31,6 +31,7 @@
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
+const merge = require('deepmerge');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -41,7 +42,7 @@ const production = !!(process.env.NODE_ENV || 'development').match(/^prod/);
 const createWebpack = (dir, options = {}) => {
   const realDir = fs.realpathSync(dir);
 
-  options = Object.assign({
+  options = merge({
     mode: 'development',
     context: realDir,
     splitChunks: false,
@@ -51,15 +52,21 @@ const createWebpack = (dir, options = {}) => {
     devtool: 'source-map',
     exclude: /(node_modules|bower_components)/,
     outputPath: path.resolve(dir, 'dist'),
-    html: {},
+    html: {
+      template: null,
+      title: 'OS.js'
+    },
     entry: {},
     plugins: [],
     copy: [],
+    rules: [],
     babel: {
       cacheDirectory: true,
-      presets: ['@babel/preset-env'],
+      presets: [
+        require.resolve('@babel/preset-env')
+      ],
       plugins: [
-        '@babel/transform-runtime'
+        require.resolve('@babel/plugin-transform-runtime')
       ]
     },
     includePaths: []
@@ -69,12 +76,11 @@ const createWebpack = (dir, options = {}) => {
     options.devtool = false;
   }
 
-  const htmlOptions = Object.assign({}, {
-    template: null,
-    title: 'OS.js'
-  }, options.html);
+  if (options.html.template) {
+    options.plugins.push(new HtmlWebpackPlugin(options.html.template));
+  }
 
-  const defaults = {
+  return {
     mode: options.mode,
     devtool: options.devtool,
     context: options.context,
@@ -94,8 +100,16 @@ const createWebpack = (dir, options = {}) => {
       sourceMapFilename: '[file].map',
       filename: '[name].js'
     },
+    resolve: {
+      modules: [
+        'node_modules',
+        path.resolve(dir, 'node_modules'),
+        path.resolve(cliRoot, 'node_modules')
+      ]
+    },
     module: {
       rules: [
+        ...options.rules,
         {
           test: /\.(png|jpe?g|gif|webp)$/,
           use: [
@@ -135,9 +149,11 @@ const createWebpack = (dir, options = {}) => {
         {
           test: /\.js$/,
           exclude: options.exclude,
+          /*
           include: [
             ...options.includePaths,
           ],
+          */
           use: {
             loader: require.resolve('babel-loader'),
             options: options.babel
@@ -163,12 +179,6 @@ const createWebpack = (dir, options = {}) => {
       ]
     }
   };
-
-  if (htmlOptions.template) {
-    defaults.plugins.push(new HtmlWebpackPlugin(htmlOptions));
-  }
-
-  return defaults;
 };
 
 module.exports = {createWebpack, webpack};
