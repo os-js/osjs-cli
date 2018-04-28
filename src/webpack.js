@@ -78,7 +78,7 @@ const createWebpack = (dir, options = {}) => {
   }
 
   if (options.html.template) {
-    options.plugins.push(new HtmlWebpackPlugin(options.html.template));
+    options.plugins.push(new HtmlWebpackPlugin(options.html));
   }
 
   if (options.jsx) {
