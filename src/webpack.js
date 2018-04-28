@@ -60,6 +60,7 @@ const createWebpack = (dir, options = {}) => {
     plugins: [],
     copy: [],
     rules: [],
+    jsx: false,
     babel: {
       cacheDirectory: true,
       presets: [
@@ -78,6 +79,11 @@ const createWebpack = (dir, options = {}) => {
 
   if (options.html.template) {
     options.plugins.push(new HtmlWebpackPlugin(options.html.template));
+  }
+
+  if (options.jsx) {
+    const p = require.resolve('@babel/plugin-transform-react-jsx');
+    options.babel.plugins.push(options.jsx === true ? p : [p, options.jsx]);
   }
 
   return {
@@ -103,7 +109,7 @@ const createWebpack = (dir, options = {}) => {
     resolve: {
       modules: [
         'node_modules',
-        path.resolve(dir, 'node_modules'),
+        path.resolve(realDir, 'node_modules'),
         path.resolve(cliRoot, 'node_modules')
       ]
     },
