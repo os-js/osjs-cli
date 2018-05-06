@@ -1,5 +1,10 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.15
+
+* Added npmignore
+* Added CHANGELOG
+
 ## 3.0.0-alpha.14
 
 * Bugfixes
