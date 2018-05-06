@@ -40,7 +40,7 @@
     "request": "^2.85.0",
     "sass-loader": "^7.0.1",
     "style-loader": "^0.21.0",
-    "webpack": "^4.5.0"
+    "webpack": "^4.7.0"
   },
   "devDependencies": {},
   "author": "Anders Evenrud <andersevenrud@gmail.com>",
