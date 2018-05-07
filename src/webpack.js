@@ -37,6 +37,7 @@ const isPlainObject = require('is-plain-object');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const {DefinePlugin} = webpack;
 const cliRoot = path.dirname(__dirname);
 const production = !!(process.env.NODE_ENV || 'development').match(/^prod/);
 
@@ -57,6 +58,7 @@ const createWebpack = (dir, options = {}) => {
       template: null,
       title: 'OS.js'
     },
+    define: {},
     entry: {},
     plugins: [],
     copy: [],
@@ -82,6 +84,12 @@ const createWebpack = (dir, options = {}) => {
 
   if (options.html.template) {
     options.plugins.push(new HtmlWebpackPlugin(options.html));
+  }
+
+  if (Object.keys(options.define).length) {
+    options.plugins.push(new DefinePlugin(Object.keys(options.define).reduce((o, k) => {
+      return Object.assign({[k]: JSON.stringify(options.define[k])}, o);
+    }, {})));
   }
 
   if (options.jsx) {
