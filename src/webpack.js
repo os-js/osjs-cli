@@ -32,6 +32,7 @@ const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 const merge = require('deepmerge');
+const isPlainObject = require('is-plain-object');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -71,7 +72,9 @@ const createWebpack = (dir, options = {}) => {
       ]
     },
     includePaths: []
-  }, options);
+  }, options, {
+    isMergeableObject: isPlainObject
+  });
 
   if (!options.sourceMap) {
     options.devtool = false;
