@@ -58,7 +58,9 @@ const createWebpack = (dir, options = {}) => {
       template: null,
       title: 'OS.js'
     },
-    define: {},
+    define: {
+      OSJS_VERSION: null
+    },
     entry: {},
     plugins: [],
     copy: [],
