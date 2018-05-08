@@ -32,6 +32,7 @@
  */
 
 const fs = require('fs');
+const which = require('which');
 const path = require('path');
 const request = require('request');
 const {spawn} = require('child_process');
@@ -63,7 +64,7 @@ const gitClone = async (src, dest) => spawnAsync('git', ['clone', '--recursive',
 /*
  * Installs dependencies
  */
-const npmInstall = async (cwd) => spawnAsync('npm', ['install'], {cwd});
+const npmInstall = async (cwd) => spawnAsync(which.sync('npm'), ['install'], {cwd});
 
 /*
  * Fetches the metadata from given url
@@ -71,7 +72,7 @@ const npmInstall = async (cwd) => spawnAsync('npm', ['install'], {cwd});
 const checkMetadata = async (root, url) => {
   const response = await requestJson(url);
   const {name} = response;
-  const dest = `${root}/src/packages/${name}`;
+  const dest = path.resolve(root, 'src/packages', name);
 
   if (fs.existsSync(dest)) {
     throw new Error(`Destination ${dest} already exists`);
