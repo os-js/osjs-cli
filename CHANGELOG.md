@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.16
+
+* Solved some issues with installer script and windows
+
 ## 3.0.0-alpha.15
 
 * Added npmignore
