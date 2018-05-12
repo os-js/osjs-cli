@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.17
+
+* Added fileLoader option to webpack config
+
 ## 3.0.0-alpha.16
 
 * Solved some issues with installer script and windows
