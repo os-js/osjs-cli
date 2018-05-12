@@ -75,6 +75,7 @@ const createWebpack = (dir, options = {}) => {
         require.resolve('@babel/plugin-transform-runtime')
       ]
     },
+    fileLoader: {},
     includePaths: []
   }, options, {
     isMergeableObject: isPlainObject
@@ -134,7 +135,7 @@ const createWebpack = (dir, options = {}) => {
           use: [
             {
               loader: require.resolve('file-loader'),
-              options: {}
+              options: options.fileLoader
             }
           ]
         },
