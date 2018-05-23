@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.18
+
+* Package installer now supports any git uri (#1)
+
 ## 3.0.0-alpha.17
 
 * Added fileLoader option to webpack config
