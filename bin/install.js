@@ -31,20 +31,11 @@
  *
  */
 
-const fs = require('fs');
+const os = require('os');
+const fs = require('fs-extra');
 const which = require('which');
 const path = require('path');
-const request = require('request');
 const {spawn} = require('child_process');
-
-/*
- * Download JSON file
- */
-const requestJson = url => new Promise((resolve, reject) => {
-  const metadata = request(url, {json: true}, (err, res, body) => {
-    return err ? reject(err) : resolve(body);
-  });
-});
 
 /*
  * Spawn process
@@ -67,12 +58,21 @@ const gitClone = async (src, dest) => spawnAsync('git', ['clone', '--recursive',
 const npmInstall = async (cwd) => spawnAsync(which.sync('npm'), ['install'], {cwd});
 
 /*
- * Fetches the metadata from given url
+ * Gets the metadata path
  */
-const checkMetadata = async (root, url) => {
-  const response = await requestJson(url);
-  const {name} = response;
-  const dest = path.resolve(root, 'src/packages', name);
+const getMetadataPath = (root, tmpFile) => {
+  const src = path.join(tmpFile, 'metadata.json');
+  if (!fs.existsSync(src)) {
+    throw new Error('Could not find metadata file');
+  }
+
+  const metadata = fs.readJsonSync(src);
+
+  if (!metadata || !metadata.name) {
+    throw new Error('The package does not contain any relevant OS.js metadata');
+  }
+
+  const dest = path.resolve(root, 'src/packages', metadata.name);
 
   if (fs.existsSync(dest)) {
     throw new Error(`Destination ${dest} already exists`);
@@ -85,32 +85,39 @@ const checkMetadata = async (root, url) => {
  * Install GIT package
  */
 const installGit = async (root, src) => {
-  if (!src.match(/github\.com/)) {
-    throw new Error('Only github packages are supported');
-  }
+  const tmpDest = path.join(os.tmpdir(), `osjs_${Date.now()}`);
 
-  const metadataFile = src
-    .replace('github.com', 'raw.githubusercontent.com')
-    .replace(/(\.git)?$/, '/master/metadata.json')
+  console.log('Downloading into', tmpDest);
 
-  const dest = await checkMetadata(root, metadataFile);
-
-  console.log('Installing into', dest);
-
-  const cloneCode = await gitClone(src, dest);
-  if (cloneCode !== true) {
-    throw new Error('Failed to clone repository. Error code: ' + String(cloneCode));
-  }
-
-  const packageJsonFile = path.resolve(dest, 'package.json');
-  if (fs.existsSync(packageJsonFile)) {
-    console.log('Installing npm dependencies....');
-
-    const depsCode = await npmInstall(dest);
+  try {
+    const cloneCode = await gitClone(src, tmpDest);
     if (cloneCode !== true) {
-      throw new Error('Failed to install dependencies. Error code: ' + String(depsCode));
+      throw new Error('Failed to clone repository. Error code: ' + String(cloneCode));
     }
+
+    const dest = getMetadataPath(root, tmpDest);
+
+    console.log('Installing into', dest);
+    fs.copySync(tmpDest, dest);
+
+    const packageJsonFile = path.resolve(dest, 'package.json');
+    if (fs.existsSync(packageJsonFile)) {
+      console.log('Installing npm dependencies....');
+
+      const depsCode = await npmInstall(dest);
+      if (cloneCode !== true) {
+        throw new Error('Failed to install dependencies. Error code: ' + String(depsCode));
+      }
+    }
+
+    return true;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    fs.removeSync(tmpDest);
   }
+
+  return false;
 };
 
 /*
@@ -131,12 +138,14 @@ const run = async (root, args) => {
 
   const isNpm = src => !src.match(/^http/);
   const method = isNpm(src) ? installNpm : installGit;
-  await method(root, src);
+  const result = await method(root, src);
 
-  console.log('\n\nDone... remember: ');
-  console.log('- "npm run build:manifest" to update package manifest');
-  console.log('- "npm run build:dist" to rebuild sources');
-  console.log('- Reload the server as some packages rely on server-side scripts.');
+  if (result) {
+    console.log('\n\nDone... remember: ');
+    console.log('- "npm run build:manifest" to update package manifest');
+    console.log('- "npm run build:dist" to rebuild sources');
+    console.log('- Reload the server as some packages rely on server-side scripts.');
+  }
 };
 
 // Main
