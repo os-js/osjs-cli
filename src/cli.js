@@ -29,45 +29,12 @@
  */
 
 const fs = require('fs-extra');
-const os = require('os');
 const path = require('path');
-const utils = require('./utils.js');
-const builder = require('./build.js');
 const minimist = require('minimist');
-const symbols = require('log-symbols');
-const inspect = require('util').inspect;
 
 const DEFAULT_TASKS = {
-  'build:manifest': async ({options, args}) => {
-    console.log(symbols.info, 'Making manifest');
-
-    const packages = await utils.manifests(options.packages);
-
-    packages.forEach(m => console.log(symbols.success, `${m.name} (${m.type})`));
-
-    builder.buildManifest(options.dist.metadata, packages);
-  },
-
-  'build:dist': async ({options, args}) => {
-    console.log(symbols.info, 'Starting build process....');
-    console.log(`platform: ${os.platform()} (${os.release()}) arch: ${os.arch()} cpus: ${os.cpus().length} mem: ${os.totalmem()} node: ${process.versions.node}`);
-
-    const webpacks = await utils.webpacks(options, args);
-    if (args['dump-webpack']) {
-      webpacks.forEach(w => console.log(inspect(w, {depth: null})));
-    }
-
-    if (args.watch) {
-      console.log(symbols.info, 'Watching', {
-        aggregateTimeout: 250,
-        ignored: /node_modules/
-      });
-      builder.watch(webpacks);
-    } else {
-      console.log(symbols.info, 'Building');
-      builder.build(webpacks);
-    }
-  }
+  'build:manifest': require('./tasks/manifest.js'),
+  'build:dist': require('./tasks/dist.js')
 };
 
 const loadTasks = (options, args) => {
