@@ -136,7 +136,7 @@ const run = async (root, args) => {
     throw new Error('No source given');
   }
 
-  const isNpm = src => !src.match(/^http/);
+  const isNpm = src => !src.match(/^(http|git)/);
   const method = isNpm(src) ? installNpm : installGit;
   const result = await method(root, src);
 

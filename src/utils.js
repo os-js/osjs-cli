@@ -30,9 +30,9 @@
 
 const globby = require('globby');
 const path = require('path');
-const fs = require('fs');
+const webpacker = require('./webpack.js');
 
-const manifests = async(dir) => {
+const manifests = async (dir) => {
   const paths = await globby(dir + '/*/metadata.json');
 
   return paths.map(p => {
@@ -45,6 +45,59 @@ const manifests = async(dir) => {
   });
 };
 
+const webpacks = async (options, args) => {
+  let webpacks = [];
+  const packages = await manifests(options.packages);
+
+  const concat = list => {
+    if (list.length) {
+      console.log('Including:');
+      list.forEach(p => console.log(`- ${p.name} (${p.type})`));
+
+      const load = p => require(`${options.packages}/${p._basename}/webpack.js`)(
+        options,
+        webpacker
+      );
+
+      webpacks = webpacks.concat(list.map(load));
+    }
+  };
+
+  const buildEverything = [args.core, args.application, args.applications, args.themes]
+    .every(val => typeof val === 'undefined');
+
+  const buildApplications = buildEverything || !!(args.application || args.applications);
+  const buildThemes = buildEverything || !!args.themes;
+  const buildCore = buildEverything || !!args.core;
+
+  if (buildCore) {
+    const coreConfig = require(options.config);
+    webpacks.push(coreConfig);
+  }
+
+  if (buildApplications) {
+    const filter = buildEverything ? meta => true : args.applications
+      ? meta => args.applications === '*' || args.applications.split(',').indexOf(meta.name) !== -1
+      : meta => meta.name === args.application;
+
+    const applications = packages
+      .filter(p => p.type === 'application')
+      .filter(filter);
+
+    concat(applications);
+  }
+
+  if (buildThemes) {
+    const themes = packages
+      .filter(p => p.type === 'theme');
+
+    concat(themes);
+  }
+
+  return webpacks;
+};
+
 module.exports = {
-  manifests
+  manifests,
+  webpacks
 };

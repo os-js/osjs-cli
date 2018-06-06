@@ -28,16 +28,16 @@
  * @licence Simplified BSD License
  */
 
+const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
 const utils = require('./utils.js');
-const builder = require('./build.js')
-const webpacker = require('./webpack.js');
+const builder = require('./build.js');
 const minimist = require('minimist');
 const symbols = require('log-symbols');
 const inspect = require('util').inspect;
 
-const tasks = {
+const DEFAULT_TASKS = {
   'build:manifest': async ({options, args}) => {
     console.log(symbols.info, 'Making manifest');
 
@@ -49,58 +49,10 @@ const tasks = {
   },
 
   'build:dist': async ({options, args}) => {
-    const publicPath = path.resolve(options.root, 'dist');
-    let webpacks = [];
-
     console.log(symbols.info, 'Starting build process....');
     console.log(`platform: ${os.platform()} (${os.release()}) arch: ${os.arch()} cpus: ${os.cpus().length} mem: ${os.totalmem()} node: ${process.versions.node}`);
 
-    const packages = await utils.manifests(options.packages);
-
-    const concat = list => {
-      if (list.length) {
-        console.log('Including:');
-        list.forEach(p => console.log(`- ${p.name} (${p.type})`));
-
-        const load = p => require(`${options.packages}/${p._basename}/webpack.js`)(
-          options,
-          webpacker
-        );
-        webpacks = webpacks.concat(list.map(load));
-      }
-    };
-
-    const buildEverything = [args.core, args.application, args.applications, args.themes]
-      .every(val => typeof val === 'undefined');
-
-    const buildApplications = buildEverything || !!(args.application || args.applications);
-    const buildThemes = buildEverything || !!args.themes;
-    const buildCore = buildEverything || !!args.core;
-
-    if (buildCore) {
-      const coreConfig = require(options.config);
-      webpacks.push(coreConfig);
-    }
-
-    if (buildApplications) {
-      const filter = buildEverything ? meta => true : args.applications
-        ? meta => args.applications === '*' || args.applications.split(',').indexOf(meta.name) !== -1
-        : meta => meta.name === args.application;
-
-      const applications = packages
-        .filter(p => p.type === 'application')
-        .filter(filter);
-
-      concat(applications);
-    }
-
-    if (buildThemes) {
-      const themes = packages
-        .filter(p => p.type === 'theme');
-
-      concat(themes);
-    }
-
+    const webpacks = await utils.webpacks(options, args);
     if (args['dump-webpack']) {
       webpacks.forEach(w => console.log(inspect(w, {depth: null})));
     }
@@ -118,27 +70,56 @@ const tasks = {
   }
 };
 
-const cli = async (argv, options) => {
+const loadTasks = (options, args) => {
+  const tasks = Object.assign({}, DEFAULT_TASKS);
+
+  const loadFile = path.resolve(options.cli, 'index.js');
+  if (fs.existsSync(loadFile)) {
+    try {
+      const includes = require(loadFile);
+      if (args.debug) {
+        console.log('Including external tasks', Object.keys(includes));
+      }
+      Object.assign(tasks, includes);
+    } catch (e) {
+      console.error('Failed to load', loadFile);
+      console.error(e);
+    }
+  }
+
+  return Promise.resolve(tasks);
+};
+
+const createOptions = options => Object.assign({
+  production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
+  config: path.resolve(options.root, 'src/conf/webpack.config.js'),
+  cli: path.resolve(options.root, 'src/cli'),
+  packages: path.resolve(options.root, 'src/packages'),
+  dist: {
+    themes: path.resolve(options.root, 'dist/themes'),
+    packages: path.resolve(options.root, 'dist/apps'), // FIXME: Rename to applications
+    metadata: path.resolve(options.root, 'dist/metadata.json')
+  }
+}, options);
+
+const cli = async (argv, opts) => {
+  const options = createOptions(opts);
   const args = minimist(argv);
   const [arg] = args._;
-
-  options = Object.assign({}, {
-    production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
-    config: path.resolve(options.root, 'src/conf/webpack.config.js'),
-    packages: path.resolve(options.root, 'src/packages'),
-    dist: {
-      themes: path.resolve(options.root, 'dist/themes'),
-      packages: path.resolve(options.root, 'dist/apps'), // FIXME: Rename to applications
-      metadata: path.resolve(options.root, 'dist/metadata.json')
-    }
-  }, options);
-
-  if (arg in tasks) {
-    tasks[arg]({options, args});
-  } else {
-    console.error('Invalid command', arg);
+  const error = msg => {
+    console.error(msg);
     process.exit(1);
-  }
+  };
+
+  loadTasks(options, args).then(tasks => {
+    if (!arg) {
+      error('Available tasks: \n' + Object.keys(tasks).join(' '));
+    } else if (arg in tasks) {
+      tasks[arg]({options, args});
+    } else {
+      error('Invalid command', arg);
+    }
+  }).catch(error);
 };
 
 module.exports = cli;
