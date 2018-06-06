@@ -119,7 +119,8 @@ const cli = async (argv, opts) => {
     if (!arg) {
       error('Available tasks: \n' + Object.keys(tasks).join(' '));
     } else if (arg in tasks) {
-      tasks[arg]({options, args});
+      tasks[arg]({options, args})
+        .catch(error);
     } else {
       error('Invalid command', arg);
     }
