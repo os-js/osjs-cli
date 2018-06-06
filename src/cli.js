@@ -77,10 +77,14 @@ const loadTasks = (options, args) => {
   if (fs.existsSync(loadFile)) {
     try {
       const includes = require(loadFile);
-      if (args.debug) {
-        console.log('Including external tasks', Object.keys(includes));
-      }
-      Object.assign(tasks, includes);
+      return new Promise((resolve, reject) => {
+        const promises = includes.map(fn => fn(options));
+
+        Promise.all(promises).then(results => {
+          results.forEach(ts => Object.assign(tasks, ts));
+          resolve(tasks);
+        }).catch(reject);
+      });
     } catch (e) {
       console.error('Failed to load', loadFile);
       console.error(e);
