@@ -1,5 +1,11 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.19
+
+* Separated tasks into separate files
+* Handle task rejection
+* Support loading external tasks
+
 ## 3.0.0-alpha.18
 
 * Package installer now supports any git uri (#1)
