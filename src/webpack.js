@@ -50,7 +50,7 @@ const createWebpack = (dir, options = {}) => {
     splitChunks: false,
     runtimeChunk: false,
     minimize: production,
-    sourceMap: production,
+    sourceMap: true,
     devtool: 'source-map',
     exclude: /(node_modules|bower_components)/,
     outputPath: path.resolve(dir, 'dist'),
