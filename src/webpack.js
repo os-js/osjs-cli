@@ -51,6 +51,7 @@ const createWebpack = (dir, options = {}) => {
     runtimeChunk: false,
     minimize: production,
     sourceMap: true,
+    symlinks: true,
     devtool: 'source-map',
     exclude: /(node_modules|bower_components)/,
     outputPath: path.resolve(dir, 'dist'),
@@ -121,6 +122,7 @@ const createWebpack = (dir, options = {}) => {
       filename: '[name].js'
     },
     resolve: {
+      symlinks: options.symlinks,
       modules: [
         'node_modules',
         path.resolve(realDir, 'node_modules'),
