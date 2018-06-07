@@ -1,5 +1,11 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.20
+
+* Added 'symlinks' option (#3)
+* Always compile sourceMaps by default
+* Updated dependencies
+
 ## 3.0.0-alpha.19
 
 * Separated tasks into separate files
