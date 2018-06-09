@@ -35,7 +35,8 @@ const merge = require('deepmerge');
 const isPlainObject = require('is-plain-object');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const {DefinePlugin} = webpack;
 const cliRoot = path.dirname(__dirname);
@@ -90,6 +91,10 @@ const createWebpack = (dir, options = {}) => {
     options.plugins.push(new HtmlWebpackPlugin(options.html));
   }
 
+  if (options.minimize) {
+    options.plugins.push(new OptimizeCSSAssetsPlugin({}));
+  }
+
   if (Object.keys(options.define).length) {
     options.plugins.push(new DefinePlugin(Object.keys(options.define).reduce((o, k) => {
       return Object.assign({[k]: JSON.stringify(options.define[k])}, o);
@@ -106,7 +111,10 @@ const createWebpack = (dir, options = {}) => {
     devtool: options.devtool,
     context: options.context,
     plugins: [
-      new ExtractTextPlugin('[name].css'),
+      new MiniCssExtractPlugin({
+        filename: production ? '[name].[hash].css' : '[name].css',
+        chunkFilename: production ? '[id].[hash].css' : '[id].css'
+      }),
       new CopyWebpackPlugin(options.copy),
       ...options.plugins
     ],
@@ -142,31 +150,27 @@ const createWebpack = (dir, options = {}) => {
           ]
         },
         {
-          test: /\.s?css$/,
-          use: ExtractTextPlugin.extract({
-            fallback: {
-              loader: require.resolve('style-loader')
-            },
-            use: [
-              {
-                loader: require.resolve('css-loader'),
-                options: {
-                  minimize: options.minimize,
-                  sourceMap: options.sourceMap
-                }
-              },
-              {
-                loader: require.resolve('sass-loader'),
-                options: {
-                  minimize: options.minimize,
-                  sourceMap: options.sourceMap,
-                  includePaths: [
-                    ...options.includePaths,
-                  ]
-                }
+          test: /\.(sa|sc|c)ss$/,
+          use: [
+            MiniCssExtractPlugin.loader,
+            {
+              loader: require.resolve('css-loader'),
+              options: {
+                minimize: options.minimize,
+                sourceMap: options.sourceMap
               }
-            ]
-          })
+            },
+            {
+              loader: require.resolve('sass-loader'),
+              options: {
+                minimize: options.minimize,
+                sourceMap: options.sourceMap,
+                includePaths: [
+                  ...options.includePaths,
+                ]
+              }
+            }
+          ]
         },
         {
           test: /\.js$/,
