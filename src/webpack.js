@@ -92,7 +92,11 @@ const createWebpack = (dir, options = {}) => {
   }
 
   if (options.minimize) {
-    options.plugins.push(new OptimizeCSSAssetsPlugin({}));
+    options.plugins.push(new OptimizeCSSAssetsPlugin({
+      cssProcessorOptions: {
+        discardComments: true
+      },
+    }));
   }
 
   if (Object.keys(options.define).length) {
@@ -112,8 +116,8 @@ const createWebpack = (dir, options = {}) => {
     context: options.context,
     plugins: [
       new MiniCssExtractPlugin({
-        filename: production ? '[name].[hash].css' : '[name].css',
-        chunkFilename: production ? '[id].[hash].css' : '[id].css'
+        filename: '[name].css',
+        chunkFilename: '[id].css'
       }),
       new CopyWebpackPlugin(options.copy),
       ...options.plugins
