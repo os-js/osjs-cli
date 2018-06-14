@@ -87,7 +87,7 @@ const cli = async (argv, opts) => {
 
   loadTasks(options, args).then(tasks => {
     if (!arg) {
-      error('Available tasks: \n' + Object.keys(tasks).join(' '));
+      error('Available tasks: \n' + Object.keys(tasks).map(t => `- ${t}`).join('\n'));
     } else if (arg in tasks) {
       tasks[arg]({options, args})
         .catch(error);
