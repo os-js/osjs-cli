@@ -32,6 +32,7 @@ const fs = require('fs-extra');
 const globby = require('globby');
 const path = require('path');
 const webpacker = require('./webpack.js');
+const {spawn} = require('child_process');
 
 const manifests = async (dir) => {
   const paths = await globby(dir + '/*/metadata.json');
@@ -117,8 +118,17 @@ const npmPackages = async (root) => {
     .then(results => results.filter(res => !!res))
 };
 
+const spawnAsync = (cmd, args, options) => new Promise((resolve, reject) => {
+  const child = spawn(cmd, args, Object.assign({}, {
+    stdio: ['pipe', process.stdout, process.stderr]
+  }, options || {}));
+  child.on('close', code => code ? reject(code) : resolve(true));
+});
+
+
 module.exports = {
   npmPackages,
   manifests,
-  webpacks
+  webpacks,
+  spawnAsync
 };

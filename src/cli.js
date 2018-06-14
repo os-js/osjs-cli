@@ -36,6 +36,7 @@ const DEFAULT_TASKS = {
   'build:manifest': require('./tasks/manifest.js'),
   'build:dist': require('./tasks/dist.js'),
   'package:install': require('./tasks/install.js'),
+  'package:upgrade': require('./tasks/upgrade.js'),
   'package:discover': require('./tasks/discover.js')
 };
 

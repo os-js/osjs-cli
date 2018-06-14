@@ -32,17 +32,7 @@ const os = require('os');
 const fs = require('fs-extra');
 const which = require('which');
 const path = require('path');
-const {spawn} = require('child_process');
-
-/*
- * Spawn process
- */
-const spawnAsync = (cmd, args, options) => new Promise((resolve, reject) => {
-  const child = spawn(cmd, args, Object.assign({}, {
-    stdio: ['pipe', process.stdout, process.stderr]
-  }, options || {}));
-  child.on('close', code => code ? reject(code) : resolve(true));
-});
+const {spawnAsync} = require('../utils.js');
 
 /*
  * Runs git clone
