@@ -14,8 +14,7 @@
     "osjs"
   ],
   "bin": {
-    "osjs-cli": "bin/cli.js",
-    "osjs-install-package": "bin/install.js"
+    "osjs-cli": "bin/cli.js"
   },
   "engines": {
     "node": ">=8.0"
