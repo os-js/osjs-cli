@@ -1,5 +1,14 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.21
+
+* Updated command list printout
+* Added 'package:upgrade' task
+* Moved osjs-install-package to cli task ('package:install')
+* Added 'package:discover' task
+* Updated some optimization settings in webpack
+* Replaced 'extract-text-webpack-plugin' with 'mini-css-extract-plugin'
+
 ## 3.0.0-alpha.20
 
 * Added 'symlinks' option (#3)
