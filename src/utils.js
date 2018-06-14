@@ -28,6 +28,7 @@
  * @licence Simplified BSD License
  */
 
+const fs = require('fs-extra');
 const globby = require('globby');
 const path = require('path');
 const webpacker = require('./webpack.js');
@@ -97,7 +98,27 @@ const webpacks = async (options, args) => {
   return webpacks;
 };
 
+const npmPackages = async (root) => {
+  const globs = await globby(root + '/**/package.json');
+  const metafilename = dir => path.resolve(dir, 'metadata.json');
+
+  const promises = globs.map(filename => fs.readJson(filename)
+      .then(json => ({filename: path.dirname(filename), json})));
+
+  return Promise.all(promises)
+    .then(results => results.filter(
+      ({filename, json}) => !!json.osjs && json.osjs.type === 'package'
+    ))
+    .then(results => Promise.all(results.map(
+      ({filename, json}) => fs.readJson(metafilename(filename))
+        .catch(error => console.warn(error))
+        .then(meta => ({meta, filename, json}))
+    )))
+    .then(results => results.filter(res => !!res))
+};
+
 module.exports = {
+  npmPackages,
   manifests,
   webpacks
 };

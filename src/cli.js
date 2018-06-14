@@ -34,7 +34,8 @@ const minimist = require('minimist');
 
 const DEFAULT_TASKS = {
   'build:manifest': require('./tasks/manifest.js'),
-  'build:dist': require('./tasks/dist.js')
+  'build:dist': require('./tasks/dist.js'),
+  'package:discover': require('./tasks/discover.js')
 };
 
 const loadTasks = (options, args) => {
