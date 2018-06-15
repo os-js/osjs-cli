@@ -66,7 +66,7 @@ const loadTasks = (options, args) => {
 
 const createOptions = options => Object.assign({
   production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
-  config: path.resolve(options.root, 'src/conf/webpack.config.js'),
+  config: path.resolve(options.root, 'src/client/webpack.config.js'),
   cli: path.resolve(options.root, 'src/cli'),
   packages: path.resolve(options.root, 'src/packages'),
   dist: {
