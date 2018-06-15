@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.22
+
+* Changed core webpack config path from 'src/conf/webpack.config.js' to 'src/client/webpack.config.js'
+
 ## 3.0.0-alpha.21
 
 * Updated command list printout
