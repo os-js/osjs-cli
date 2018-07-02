@@ -37,7 +37,8 @@ const DEFAULT_TASKS = {
   'build:dist': require('./tasks/dist.js'),
   'package:install': require('./tasks/install.js'),
   'package:upgrade': require('./tasks/upgrade.js'),
-  'package:discover': require('./tasks/discover.js')
+  'package:discover': require('./tasks/discover.js'),
+  'package:create': require('./tasks/create.js')
 };
 
 const loadTasks = (options, args) => {
