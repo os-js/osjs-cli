@@ -1,5 +1,11 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.23
+
+* Updated dependencies
+* Added 'package:create' command
+* Removed unused dependency
+
 ## 3.0.0-alpha.22
 
 * Changed core webpack config path from 'src/conf/webpack.config.js' to 'src/client/webpack.config.js'
