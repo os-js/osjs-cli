@@ -117,7 +117,10 @@ const cli = async (argv, opts) => {
     } else if (arg in tasks) {
       const logger = signaler(arg);
 
+      signale.time(arg);
+
       tasks[arg]({logger, options, args})
+        .then(() => signale.timeEnd(arg))
         .catch(error);
     } else {
       error('Invalid command', arg);

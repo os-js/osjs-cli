@@ -46,7 +46,7 @@ const webpackLogger = (logger, cb) => (err, status) => {
   }
 
   if (typeof cb === 'function') {
-    cb();
+    cb(err, status);
   }
 
   if (!err) {
@@ -78,8 +78,9 @@ module.exports = async ({logger, options, args}) => {
     }, webpackLogger);
   } else {
     logger.await('Building with Webpack');
-    logger.time('webpack');
 
-    build(logger, webpacks, () => logger.timeEnd('webpack'));
+    return new Promise((resolve, reject) => {
+      build(logger, webpacks, err => err ? reject(err) : resolve());
+    });
   }
 };
