@@ -160,7 +160,7 @@ const createWebpack = (dir, options = {}) => {
             {
               loader: require.resolve('css-loader'),
               options: {
-                minimize: options.minimize,
+                //minimize: options.minimize,
                 sourceMap: options.sourceMap
               }
             },
