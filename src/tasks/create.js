@@ -48,7 +48,7 @@ const filterInput = input => String(input)
 const gitClone = async (src, dest) => spawnAsync('git', ['clone', '--recursive', src, dest]);
 
 module.exports = async ({logger, options, args}) => {
-  const destdir = path.resolve(options.root, 'src', 'packages');
+  const destdir = args.root ? path.resolve(args.root) : path.resolve(options.root, 'src', 'packages');
   const packages = await utils.manifests(options.packages);
 
   const answers = await inquirer.prompt([{
@@ -69,7 +69,6 @@ module.exports = async ({logger, options, args}) => {
       return Promise.resolve(true);
     }
   }]);
-
 
   const dest = path.join(destdir, answers.name);
   const exists = await fs.exists(dest);
