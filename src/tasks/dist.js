@@ -28,28 +28,58 @@
  * @licence Simplified BSD License
  */
 const os = require('os');
-const symbols = require('log-symbols');
 const inspect = require('util').inspect;
-const builder = require('../build.js');
 const utils = require('../utils.js');
+const webpack = require('webpack');
 
-module.exports = async ({options, args}) => {
-  console.log(symbols.info, 'Starting build process....');
-  console.log(`platform: ${os.platform()} (${os.release()}) arch: ${os.arch()} cpus: ${os.cpus().length} mem: ${os.totalmem()} node: ${process.versions.node}`);
+const webpackLogger = (logger, cb) => (err, status) => {
+  if (err) {
+    logger.warn('An error occured while building');
+    logger.fatal(new Error(err.stack || err));
+  } else {
+    console.log(status.toString({
+      version: false,
+      modules: false,
+      chunks: false,
+      colors: true
+    }));
+  }
 
-  const webpacks = await utils.webpacks(options, args);
+  if (typeof cb === 'function') {
+    cb();
+  }
+
+  if (!err) {
+    logger.success('Build successful');
+  }
+};
+
+const build = (logger, configurations, cb) => webpack(configurations)
+  .run(webpackLogger(logger, cb));
+
+const watch = (logger, configurations, options, cb) => webpack(configurations)
+  .watch(options, webpackLogger(logger, cb));
+
+module.exports = async ({logger, options, args}) => {
+  logger.await('Building dist');
+  logger.info(`platform: ${os.platform()} (${os.release()}) arch: ${os.arch()} cpus: ${os.cpus().length} mem: ${os.totalmem()} node: ${process.versions.node}`);
+
+  const webpacks = await utils.webpacks(options, args, logger);
   if (args['dump-webpack']) {
     webpacks.forEach(w => console.log(inspect(w, {depth: null})));
   }
 
   if (args.watch) {
-    console.log(symbols.info, 'Watching', {
+    logger.watch('Watching with Webpack');
+
+    watch(logger, webpacks, {
       aggregateTimeout: 250,
       ignored: /node_modules/
-    });
-    builder.watch(webpacks);
+    }, webpackLogger);
   } else {
-    console.log(symbols.info, 'Building');
-    builder.build(webpacks);
+    logger.await('Building with Webpack');
+    logger.time('webpack');
+
+    build(logger, webpacks, () => logger.timeEnd('webpack'));
   }
 };

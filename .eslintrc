@@ -12,7 +12,7 @@
     "ArrayBuffer": true,
     "File": true,
     "Blob": true,
-    "OSJS_VERSION": true
+    "Proxy": true
   },
   "extends": "eslint:recommended",
   "rules": {

@@ -47,14 +47,15 @@ const manifests = async (dir) => {
   });
 };
 
-const webpacks = async (options, args) => {
+const webpacks = async (options, args, logger) => {
   let webpacks = [];
   const packages = await manifests(options.packages);
 
   const concat = list => {
     if (list.length) {
-      console.log('Including:');
-      list.forEach(p => console.log(`- ${p.name} (${p.type})`));
+      if (logger) {
+        list.forEach(p => logger.await(`${p.name} (${p.type})`));
+      }
 
       const load = p => require(`${options.packages}/${p._basename}/webpack.js`)(
         options,
@@ -104,7 +105,7 @@ const npmPackages = async (root) => {
   const metafilename = dir => path.resolve(dir, 'metadata.json');
 
   const promises = globs.map(filename => fs.readJson(filename)
-      .then(json => ({filename: path.dirname(filename), json})));
+    .then(json => ({filename: path.dirname(filename), json})));
 
   return Promise.all(promises)
     .then(results => results.filter(
@@ -115,7 +116,7 @@ const npmPackages = async (root) => {
         .catch(error => console.warn(error))
         .then(meta => ({meta, filename, json}))
     )))
-    .then(results => results.filter(res => !!res))
+    .then(results => results.filter(res => !!res));
 };
 
 const spawnAsync = (cmd, args, options) => new Promise((resolve, reject) => {

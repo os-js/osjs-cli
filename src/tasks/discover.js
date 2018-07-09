@@ -27,32 +27,35 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-const symbols = require('log-symbols');
 const utils = require('../utils.js');
 const path = require('path');
 const fs = require('fs-extra');
 
-module.exports = async ({options, args}) => {
-  console.log(symbols.info, 'Linking packages');
+module.exports = async ({logger, options, args}) => {
+  logger.await('Discovering and linking packages');
 
-  const dir = path.resolve(args.root) || path.resolve(options.root, 'node_modules');
+  const dir = args.root
+    ? path.resolve(args.root)
+    : path.resolve(options.root, 'node_modules');
+
   const destdir = path.resolve(options.root, 'src', 'packages');
   const packages = await utils.npmPackages(dir);
 
   return Promise.all(packages.map(pkg => {
     const dest = path.resolve(destdir, pkg.meta.name);
 
-    console.log(symbols.info, 'Discovered', pkg.json.name, 'as', pkg.meta.name);
+    logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name);
 
     return fs.ensureSymlink(pkg.filename, dest)
       .then(() => {
-        console.log(symbols.success, dest);
+        logger.complete(dest);
         return true;
       })
-      .catch(err => console.error(symbols.error, dest, err));
+      .catch(err => {
+        logger.warn('Error linking', dest);
+        logger.fatal(new Error(err));
+      });
   })).then(results => {
-    console.log(results.filter(b => !!b).length + ' package(s) discovered and linked.');
+    logger.success(results.filter(b => !!b).length + ' package(s) discovered and linked.');
   });
-
-  console.log(packages)
 };

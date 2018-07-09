@@ -27,16 +27,33 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-const symbols = require('log-symbols');
-const builder = require('../build.js');
+const fs = require('fs');
+const path = require('path');
 const utils = require('../utils.js');
 
-module.exports = async ({options, args}) => {
-  console.log(symbols.info, 'Making manifest');
+const buildManifest = (dir, data, options = []) => {
+  const valid = [].concat(data); // TODO
+  const json = JSON.stringify(data);
+  if (!fs.existsSync(path.dirname(dir))) {
+    fs.mkdirSync(path.dirname(dir));
+  }
+  fs.writeFileSync(dir, json);
+  return valid;
+};
+
+module.exports = async ({logger, options, args}) => {
+  logger.await('Making manifest');
 
   const packages = await utils.manifests(options.packages);
 
-  packages.forEach(m => console.log(symbols.success, `${m.name} (${m.type})`));
+  packages.forEach(m => logger.note(`${m.name} (${m.type})`));
 
-  builder.buildManifest(options.dist.metadata, packages);
+  try {
+    buildManifest(options.dist.metadata, packages);
+
+    logger.success('Operation successful');
+  } catch (e) {
+    logger.warn('An error occured while building manifest');
+    logger.fatal(new Error(e));
+  }
 };

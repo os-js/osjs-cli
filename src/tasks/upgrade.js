@@ -31,7 +31,6 @@
 const {spawnAsync} = require('../utils.js');
 const path = require('path');
 const fs = require('fs-extra');
-const symbols = require('log-symbols');
 
 const gitPull = async (cwd) => spawnAsync('git', ['pull'], {cwd});
 const npmInstall = async (cwd) => spawnAsync('npm', ['install'], {cwd});
@@ -54,14 +53,14 @@ const getGitPackages = list => Promise.all(
 const upgrade = dir => gitPull(dir)
   .then(() => npmInstall(dir));
 
-module.exports = ({options, args}) => {
+module.exports = ({logger, options, args}) => {
   const pp = path.resolve(options.root, 'src', 'packages');
 
   return fs.readdir(pp)
     .then(filenames => getNonSymlinks(pp, filenames))
     .then(filenames => getGitPackages(filenames))
     .then(filenames => Promise.all(filenames.map(f => {
-      console.log(symbols.info, 'Upgrading package in', f);
+      logger.await('Upgrading package in', f);
       return upgrade(f);
     })));
 };

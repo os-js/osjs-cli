@@ -31,6 +31,30 @@
 const fs = require('fs-extra');
 const path = require('path');
 const minimist = require('minimist');
+const figures = require('figures');
+const {Signale} = require('signale');
+
+const signale = new Signale({
+  types: {
+    found: {
+      badge: figures.play,
+      color: 'green',
+      label: 'found'
+    }
+  }
+});
+
+const signaler = prefix => {
+  const types = Object.keys(signale._types);
+
+  return new Proxy(signale, {
+    get: (s, field) => {
+      return typeof s[field] === 'function' && types.indexOf(field) !== -1
+        ? (...message) => s[field]({prefix, message})
+        : s[field];
+    }
+  });
+};
 
 const DEFAULT_TASKS = {
   'build:manifest': require('./tasks/manifest.js'),
@@ -43,6 +67,7 @@ const DEFAULT_TASKS = {
 
 const loadTasks = (options, args) => {
   const tasks = Object.assign({}, DEFAULT_TASKS);
+  const logger = signaler('osjs-cli');
 
   const loadFile = path.resolve(options.cli, 'index.js');
   if (fs.existsSync(loadFile)) {
@@ -57,8 +82,8 @@ const loadTasks = (options, args) => {
         }).catch(reject);
       });
     } catch (e) {
-      console.error('Failed to load', loadFile);
-      console.error(e);
+      logger.warn('An error occured while loading tasks');
+      logger.fatal(new Error(e));
     }
   }
 
@@ -90,7 +115,9 @@ const cli = async (argv, opts) => {
     if (!arg) {
       error('Available tasks: \n' + Object.keys(tasks).map(t => `- ${t}`).join('\n'));
     } else if (arg in tasks) {
-      tasks[arg]({options, args})
+      const logger = signaler(arg);
+
+      tasks[arg]({logger, options, args})
         .catch(error);
     } else {
       error('Invalid command', arg);

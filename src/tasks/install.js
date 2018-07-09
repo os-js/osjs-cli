@@ -71,10 +71,10 @@ const getMetadataPath = (root, tmpFile) => {
 /*
  * Install GIT package
  */
-const installGit = async (root, src) => {
+const installGit = async (logger, root, src) => {
   const tmpDest = path.join(os.tmpdir(), `osjs_${Date.now()}`);
 
-  console.log('Downloading into', tmpDest);
+  logger.await('Downloading into', tmpDest);
 
   try {
     const cloneCode = await gitClone(src, tmpDest);
@@ -84,12 +84,12 @@ const installGit = async (root, src) => {
 
     const dest = getMetadataPath(root, tmpDest);
 
-    console.log('Installing into', dest);
+    logger.await('Installing into', dest);
     fs.copySync(tmpDest, dest);
 
     const packageJsonFile = path.resolve(dest, 'package.json');
     if (fs.existsSync(packageJsonFile)) {
-      console.log('Installing npm dependencies....');
+      logger.await('Installing npm dependencies....');
 
       const depsCode = await npmInstall(dest);
       if (cloneCode !== true) {
@@ -99,7 +99,8 @@ const installGit = async (root, src) => {
 
     return true;
   } catch (err) {
-    console.error(err);
+    logger.warn('An error occured while installing package.');
+    logger.fatal(new Error(err));
   } finally {
     fs.removeSync(tmpDest);
   }
@@ -107,17 +108,17 @@ const installGit = async (root, src) => {
   return false;
 };
 
-module.exports = async ({options, args}) => {
+module.exports = async ({logger, options, args}) => {
   if (args._.length !== 2) {
     throw new Error('You have to specify a package URI');
   }
 
-  const result = await installGit(options.root, args._[1]);
+  const result = await installGit(logger, options.root, args._[1]);
 
   if (result) {
-    console.log('\n\nDone... remember: ');
-    console.log('- "npm run build:manifest" to update package manifest');
-    console.log('- "npm run build:dist" to rebuild sources');
-    console.log('- Reload the server as some packages rely on server-side scripts.');
+    logger.success('Package installed.');
+    logger.remind('Run "build:manifest" to update the package manifest');
+    logger.remind('Run "build:dist" to rebuild');
+    logger.note('Some packages requires to restart the server');
   }
 };

@@ -28,7 +28,6 @@
  * @licence Simplified BSD License
  */
 
-const symbols = require('log-symbols');
 const inquirer = require('inquirer');
 const utils = require('../utils.js');
 const path = require('path');
@@ -48,7 +47,7 @@ const filterInput = input => String(input)
 
 const gitClone = async (src, dest) => spawnAsync('git', ['clone', '--recursive', src, dest]);
 
-module.exports = async ({options, args}) => {
+module.exports = async ({logger, options, args}) => {
   const destdir = path.resolve(options.root, 'src', 'packages');
   const packages = await utils.manifests(options.packages);
 
@@ -78,13 +77,13 @@ module.exports = async ({options, args}) => {
     throw new Error(`The destination directory ${dest} already exists`);
   }
 
-  console.log(symbols.info, 'Cloning example codebase...');
+  logger.await('Cloning example codebase...');
 
   await gitClone(GIT_REPO, dest);
 
   const replacer = replaceInFile(/MyApplication/g, answers.name);
 
-  console.log(symbols.info, 'Setting up...');
+  logger.await('Setting up...');
 
   await Promise.all([
     fs.remove(path.join(dest, '.git')),
@@ -104,7 +103,7 @@ module.exports = async ({options, args}) => {
     replacer(path.join(dest, 'index.js'))
   ]);
 
-  console.log(symbols.success, 'Done...');
+  logger.success('Done...');
 
   return Promise.resolve(true);
 };
