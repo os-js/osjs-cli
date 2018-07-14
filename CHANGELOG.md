@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.25
+
+* Fixed some logging usage errors
+
 ## 3.0.0-alpha.24
 
 * Updated dependencies
