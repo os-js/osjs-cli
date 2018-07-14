@@ -46,7 +46,7 @@ module.exports = async ({logger, options, args}) => {
 
   const packages = await utils.manifests(options.packages);
 
-  packages.forEach(m => logger.note(`${m.name} (${m.type})`));
+  packages.forEach(m => logger.note({suffix: `(${m.type})`, message: m.name}));
 
   try {
     buildManifest(options.dist.metadata, packages);
