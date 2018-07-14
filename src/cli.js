@@ -44,18 +44,6 @@ const signale = new Signale({
   }
 });
 
-const signaler = prefix => {
-  const types = Object.keys(signale._types);
-
-  return new Proxy(signale, {
-    get: (s, field) => {
-      return typeof s[field] === 'function' && types.indexOf(field) !== -1
-        ? (...message) => s[field]({prefix, message})
-        : s[field];
-    }
-  });
-};
-
 const DEFAULT_TASKS = {
   'build:manifest': require('./tasks/manifest.js'),
   'build:dist': require('./tasks/dist.js'),
@@ -67,7 +55,7 @@ const DEFAULT_TASKS = {
 
 const loadTasks = (options, args) => {
   const tasks = Object.assign({}, DEFAULT_TASKS);
-  const logger = signaler('osjs-cli');
+  const logger = signale.scope('osjs-cli');
 
   const loadFile = path.resolve(options.cli, 'index.js');
   if (fs.existsSync(loadFile)) {
@@ -115,7 +103,7 @@ const cli = async (argv, opts) => {
     if (!arg) {
       error('Available tasks: \n' + Object.keys(tasks).map(t => `- ${t}`).join('\n'));
     } else if (arg in tasks) {
-      const logger = signaler(arg);
+      const logger = signale.scope(arg);
 
       signale.time(arg);
 
