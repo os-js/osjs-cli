@@ -117,8 +117,8 @@ module.exports = async ({logger, options, args}) => {
 
   if (result) {
     logger.success('Package installed.');
-    logger.remind('Run "build:manifest" to update the package manifest');
-    logger.remind('Run "build:dist" to rebuild');
+    logger.note('Run "build:manifest" to update the package manifest');
+    logger.note('Run "build:dist" to rebuild');
     logger.note('Some packages requires to restart the server');
   }
 };
