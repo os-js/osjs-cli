@@ -1,5 +1,10 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.26
+
+* Updated manifest logging
+* Simpler signale logging
+
 ## 3.0.0-alpha.25
 
 * Fixed some logging usage errors
