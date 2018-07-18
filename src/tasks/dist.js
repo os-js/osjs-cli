@@ -1,4 +1,4 @@
-/*!
+/*
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
  * Copyright (c) 2011-2018, Anders Evenrud <andersevenrud@gmail.com>
@@ -76,6 +76,8 @@ module.exports = async ({logger, options, args}) => {
       aggregateTimeout: 250,
       ignored: /node_modules/
     }, webpackLogger);
+
+    return Promise.resolve();
   } else {
     logger.await('Building with Webpack');
 

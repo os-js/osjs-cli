@@ -1,4 +1,4 @@
-/*!
+/**
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
  * Copyright (c) 2011-2018, Anders Evenrud <andersevenrud@gmail.com>
@@ -30,6 +30,6 @@
 
 const webpack = require('webpack');
 const cli = require('./src/cli.js');
-const {createWebpack} = require('./src/webpack.js')
+const {createWebpack} = require('./src/webpack.js');
 
 module.exports = {createWebpack, webpack, cli};

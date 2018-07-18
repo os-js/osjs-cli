@@ -1,4 +1,4 @@
-/*!
+/*
  * os.js - javascript cloud/web desktop platform
  *
  * copyright (c) 2011-2018, anders evenrud <andersevenrud@gmail.com>
@@ -160,7 +160,7 @@ const createWebpack = (dir, options = {}) => {
             {
               loader: require.resolve('css-loader'),
               options: {
-                //minimize: options.minimize,
+                // minimize: options.minimize,
                 sourceMap: options.sourceMap
               }
             },
