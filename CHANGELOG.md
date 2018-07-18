@@ -1,5 +1,12 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.27
+
+* Updated dependencies
+* Added travis-ci badge to README
+* Lint pass
+* Added initial travis-ci config
+
 ## 3.0.0-alpha.26
 
 * Updated manifest logging
