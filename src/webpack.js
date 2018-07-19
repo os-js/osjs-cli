@@ -54,7 +54,7 @@ const createWebpack = (dir, options = {}) => {
     sourceMap: true,
     symlinks: true,
     devtool: 'source-map',
-    exclude: /(node_modules|bower_components)/,
+    exclude: /(node_modules|bower_components)\/(?!@osjs).*/,
     outputPath: path.resolve(dir, 'dist'),
     html: {
       template: null,
