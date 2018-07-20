@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.28
+
+* Fix for Babel getting confused about transpiling non-wrinkshrapped @osjs libs
+
 ## 3.0.0-alpha.27
 
 * Updated dependencies
