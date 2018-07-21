@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.31
+
+* Better reporting of errors/warnings from build
+
 ## 3.0.0-alpha.30
 
 * Fixed babel issues with certain paths
