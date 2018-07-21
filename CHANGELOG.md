@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.30
+
+* Fixed babel issues with certain paths
+
 ## 3.0.0-alpha.29
 
 * Fixed Babel issues on Windows
