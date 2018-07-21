@@ -43,14 +43,28 @@ const webpackLogger = (logger, cb) => (err, status) => {
       chunks: false,
       colors: true
     }));
+
+    const {warnings, errors} = status.toJson();
+    const truncated = str => ((str.split('\n').slice(0, 3).join('\n')) + '...');
+    const append = [];
+
+    if (status.hasErrors()) {
+      append.push(`With ${errors.length} error(s)`);
+    }
+
+    if (status.hasWarnings()) {
+      append.push(`With ${warnings.length} warning(s)`);
+    }
+
+    warnings.forEach(warn => logger.warn(truncated(warn)));
+    errors.forEach(error => logger.fatal(truncated(error)));
+
+    const msg = append.length ? `, with ${append.join(' and ')}` : '';
+    logger.success('Build successful' + msg);
   }
 
   if (typeof cb === 'function') {
     cb(err, status);
-  }
-
-  if (!err) {
-    logger.success('Build successful');
   }
 };
 
