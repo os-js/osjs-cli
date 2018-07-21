@@ -180,7 +180,11 @@ const createWebpack = (dir, options = {}) => {
         {
           test: /\.js$/,
           exclude: options.exclude,
-          include: options.include,
+          include: [
+            ...options.includePaths,
+            options.include,
+            dir
+          ],
           use: {
             loader: require.resolve('babel-loader'),
             options: options.babel
