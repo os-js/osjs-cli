@@ -54,7 +54,8 @@ const createWebpack = (dir, options = {}) => {
     sourceMap: true,
     symlinks: true,
     devtool: 'source-map',
-    exclude: /(node_modules|bower_components)\/(?!@osjs).*/,
+    include: /@osjs/,
+    exclude: /(node_modules|bower_components)/,
     outputPath: path.resolve(dir, 'dist'),
     html: {
       template: null,
@@ -179,11 +180,7 @@ const createWebpack = (dir, options = {}) => {
         {
           test: /\.js$/,
           exclude: options.exclude,
-          /*
-          include: [
-            ...options.includePaths,
-          ],
-          */
+          include: options.include,
           use: {
             loader: require.resolve('babel-loader'),
             options: options.babel
