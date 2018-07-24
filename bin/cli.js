@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/*!
+/**
  * os.js - javascript cloud/web desktop platform
  *
  * copyright (c) 2011-2018, anders evenrud <andersevenrud@gmail.com>
