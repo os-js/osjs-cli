@@ -49,7 +49,7 @@ module.exports = async ({logger, options, args}) => {
       ? path.resolve(options.dist.themes, pkg.meta.name)
       : path.resolve(options.dist.packages, pkg.meta.name);
 
-    return fs.ensureSymlink(s, d);
+    return fs.ensureSymlink(s, d, 'junction');
   });
 
   return Promise.all(promises)
