@@ -32,30 +32,34 @@ const path = require('path');
 const fs = require('fs-extra');
 
 module.exports = async ({logger, options, args}) => {
-  logger.await('Discovering and linking packages');
+  logger.await('Discovering packages');
 
-  const dir = args.root
+  const root = args.root
     ? path.resolve(args.root)
-    : path.resolve(options.root, 'node_modules');
+    : path.resolve(options.root);
 
-  const destdir = path.resolve(options.root, 'src', 'packages');
+  const dir = path.resolve(root, 'node_modules');
+  const dest = path.resolve(root, 'packages.json');
   const packages = await utils.npmPackages(dir);
+  const out = packages.map(pkg => pkg.filename);
 
-  return Promise.all(packages.map(pkg => {
-    const dest = path.resolve(destdir, pkg.meta.name);
+  const promises = packages.map(pkg => {
+    const s = path.resolve(pkg.filename, 'dist');
+    const d = pkg.meta.type === 'theme'
+      ? path.resolve(options.dist.themes, pkg.meta.name)
+      : path.resolve(options.dist.packages, pkg.meta.name);
 
-    logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name);
-
-    return fs.ensureSymlink(pkg.filename, dest)
-      .then(() => {
-        logger.complete(dest);
-        return true;
-      })
-      .catch(err => {
-        logger.warn('Error linking', dest);
-        logger.fatal(new Error(err));
-      });
-  })).then(results => {
-    logger.success(results.filter(b => !!b).length + ' package(s) discovered and linked.');
+    return fs.ensureSymlink(s, d);
   });
+
+  return Promise.all(promises)
+    .then(() => {
+      return fs.writeJson(dest, out).then(() => {
+        packages.forEach(pkg => {
+          logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name);
+        });
+
+        logger.success(packages.length + ' package(s) discovered.');
+      });
+    });
 };

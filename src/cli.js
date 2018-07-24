@@ -46,9 +46,6 @@ const signale = new Signale({
 
 const DEFAULT_TASKS = {
   'build:manifest': require('./tasks/manifest.js'),
-  'build:dist': require('./tasks/dist.js'),
-  'package:install': require('./tasks/install.js'),
-  'package:upgrade': require('./tasks/upgrade.js'),
   'package:discover': require('./tasks/discover.js'),
   'package:create': require('./tasks/create.js')
 };
@@ -80,9 +77,8 @@ const loadTasks = (options, args) => {
 
 const createOptions = options => Object.assign({
   production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
-  config: path.resolve(options.root, 'src/client/webpack.config.js'),
   cli: path.resolve(options.root, 'src/cli'),
-  packages: path.resolve(options.root, 'src/packages'),
+  packages: path.resolve(options.root, 'packages.json'),
   dist: {
     themes: path.resolve(options.root, 'dist/themes'),
     packages: path.resolve(options.root, 'dist/apps'), // FIXME: Rename to applications
