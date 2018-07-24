@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.35
+
+* Merged 'build:manifest' and 'package:discover' tasks
+
 ## 3.0.0-alpha.34
 
 * Updated 'package:create'
