@@ -80,7 +80,7 @@ module.exports = async ({logger, options, args}) => {
 
   await gitClone(GIT_REPO, dest);
 
-  const replacer = replaceInFile(/MyApplication/g, answers.name);
+  const replacer = replaceInFile(/My\s?Application/g, answers.name);
 
   logger.await('Setting up...');
 
@@ -88,14 +88,21 @@ module.exports = async ({logger, options, args}) => {
     fs.remove(path.join(dest, '.git')),
     fs.remove(path.join(dest, 'LICENSE')),
     fs.remove(path.join(dest, 'README.md')),
-    fs.remove(path.join(dest, 'package.json'))
-      .then(() => {
-        return fs.writeJson(path.join(dest, 'package.json'), {
-          name: answers.name,
-          osjs: {
-            type: 'package'
-          }
-        });
+    fs.readJson(path.join(dest, 'package.json'))
+      .then(json => {
+        return fs.remove(path.join(dest, 'package.json'))
+          .then(() => fs.writeJson(path.join(dest, 'package.json'), {
+            name: answers.name,
+            files: json.files,
+            scripts: json.scripts,
+            dependencies: json.dependencies,
+            devDependencies: json.devDependencies,
+            osjs: {
+              type: 'package'
+            }
+          }, {
+            spaces: 2
+          }));
       }),
     replacer(path.join(dest, 'metadata.json')),
     replacer(path.join(dest, 'index.scss')),
