@@ -111,6 +111,16 @@ const createWebpack = (dir, options = {}) => {
     options.babel.plugins.push(options.jsx === true ? p : [p, options.jsx]);
   }
 
+  if (!production) {
+    options.rules.push({
+      test: /\.js$/,
+      enforce: 'pre',
+      use: {
+        loader: require.resolve('source-map-loader')
+      }
+    });
+  }
+
   return {
     mode: options.mode,
     devtool: options.devtool,
