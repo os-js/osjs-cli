@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.33
+
+* Fixed symlink permission errors on windows for discover
+
 ## 3.0.0-alpha.32
 
 * Remove old build stuff
