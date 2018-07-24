@@ -33,23 +33,6 @@ const globby = require('globby');
 const path = require('path');
 const {spawn} = require('child_process');
 
-const manifests = async (file) => {
-  return fs.readJson(file)
-    .then(json => {
-      const promises = json.map(iter => {
-        const p = path.resolve(iter, 'metadata.json');
-        const meta = require(p);
-        return Object.assign({
-          _basename: path.basename(path.dirname(p)),
-          _path: meta.name,
-          type: 'application',
-        }, meta);
-      });
-
-      return Promise.all(promises);
-    });
-};
-
 const npmPackages = async (root) => {
   const globs = await globby(root + '/**/package.json');
   const metafilename = dir => path.resolve(dir, 'metadata.json');
@@ -79,6 +62,5 @@ const spawnAsync = (cmd, args, options) => new Promise((resolve, reject) => {
 
 module.exports = {
   npmPackages,
-  manifests,
   spawnAsync
 };

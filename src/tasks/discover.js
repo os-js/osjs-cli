@@ -30,20 +30,25 @@
 const utils = require('../utils.js');
 const path = require('path');
 const fs = require('fs-extra');
+const globby = require('globby');
+
+const clean = dir => globby(dir, {deep: false, onlyDirectories: true})
+  .then(files => Promise.all(files.map(file => fs.unlink(file))));
 
 module.exports = async ({logger, options, args}) => {
   logger.await('Discovering packages');
 
-  const root = args.root
-    ? path.resolve(args.root)
-    : path.resolve(options.root);
-
-  const dir = path.resolve(root, 'node_modules');
-  const dest = path.resolve(root, 'packages.json');
+  const dir = path.resolve(options.root, 'node_modules');
   const packages = await utils.npmPackages(dir);
-  const out = packages.map(pkg => pkg.filename);
+  const discovery = packages.map(pkg => pkg.filename);
+  const manifest = packages.map(({meta}) => {
+    return Object.assign({
+      _path: meta.name, // TODO: Deprecated
+      type: 'application'
+    }, meta);
+  });
 
-  const promises = packages.map(pkg => {
+  const discover = () => packages.map(pkg => {
     const s = path.resolve(pkg.filename, 'dist');
     const d = pkg.meta.type === 'theme'
       ? path.resolve(options.dist.themes, pkg.meta.name)
@@ -52,14 +57,17 @@ module.exports = async ({logger, options, args}) => {
     return fs.ensureSymlink(s, d, 'junction');
   });
 
-  return Promise.all(promises)
-    .then(() => {
-      return fs.writeJson(dest, out).then(() => {
-        packages.forEach(pkg => {
-          logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name);
-        });
-
-        logger.success(packages.length + ' package(s) discovered.');
-      });
-    });
+  return Promise.resolve()
+    .then(() => logger.await('Flushing out old discoveries'))
+    .then(() => fs.ensureDir(options.dist.root))
+    .then(() => fs.ensureDir(options.dist.themes))
+    .then(() => fs.ensureDir(options.dist.packages))
+    .then(() => clean(options.dist.themes))
+    .then(() => clean(options.dist.packages))
+    .then(() => logger.await('Discovering packages'))
+    .then(() => Promise.all(discover()))
+    .then(() => fs.writeJson(options.packages, discovery))
+    .then(() => fs.writeJson(options.dist.metadata, manifest))
+    .then(() => logger.success(packages.length + ' package(s) discovered.'))
+    .then(() => packages.forEach(pkg => logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name)));
 };

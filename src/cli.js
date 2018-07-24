@@ -45,7 +45,6 @@ const signale = new Signale({
 });
 
 const DEFAULT_TASKS = {
-  'build:manifest': require('./tasks/manifest.js'),
   'package:discover': require('./tasks/discover.js'),
   'package:create': require('./tasks/create.js')
 };
@@ -80,8 +79,9 @@ const createOptions = options => Object.assign({
   cli: path.resolve(options.root, 'src/cli'),
   packages: path.resolve(options.root, 'packages.json'),
   dist: {
+    root:  path.resolve(options.root, 'dist'),
     themes: path.resolve(options.root, 'dist/themes'),
-    packages: path.resolve(options.root, 'dist/apps'), // FIXME: Rename to applications
+    packages: path.resolve(options.root, 'dist/apps'),
     metadata: path.resolve(options.root, 'dist/metadata.json')
   }
 }, options);
