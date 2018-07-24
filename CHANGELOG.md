@@ -1,5 +1,10 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.32
+
+* Remove old build stuff
+* Add source map loader
+
 ## 3.0.0-alpha.31
 
 * Better reporting of errors/warnings from build
