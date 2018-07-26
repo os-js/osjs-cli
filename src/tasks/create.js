@@ -48,8 +48,9 @@ const filterInput = input => String(input)
 const gitClone = async (src, dest) => spawnAsync('git', ['clone', '--recursive', src, dest]);
 
 module.exports = async ({logger, options, args}) => {
-  const destdir = args.root ? path.resolve(args.root) : path.resolve(options.root, 'src', 'packages');
-  const packages = await utils.manifests(options.packages);
+  const destdir = path.resolve(options.root, 'src', 'packages');
+  const dir = path.resolve(options.root, 'node_modules');
+  const packages = await utils.npmPackages(dir);
 
   const answers = await inquirer.prompt([{
     name: 'name',
@@ -61,7 +62,7 @@ module.exports = async ({logger, options, args}) => {
         return Promise.reject('Invalid package name');
       }
 
-      const found = packages.find(meta => meta.name === input);
+      const found = packages.find(({meta}) => meta.name === input);
       if (found) {
         return Promise.reject('A package with this name already exists...');
       }
@@ -69,6 +70,8 @@ module.exports = async ({logger, options, args}) => {
       return Promise.resolve(true);
     }
   }]);
+
+  await fs.ensureDir(destdir);
 
   const dest = path.join(destdir, answers.name);
   const exists = await fs.exists(dest);
