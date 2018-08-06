@@ -48,10 +48,15 @@ module.exports = async ({logger, options, args}) => {
     }, meta);
   });
 
+  const roots = {
+    theme: options.dist.themes,
+    icons: options.dist.icons
+  };
+
   const discover = () => packages.map(pkg => {
     const s = path.resolve(pkg.filename, 'dist');
-    const d = pkg.meta.type === 'theme'
-      ? path.resolve(options.dist.themes, pkg.meta.name)
+    const d = roots[pkg.meta.type]
+      ? path.resolve(roots[pkg.meta.type], pkg.meta.name)
       : path.resolve(options.dist.packages, pkg.meta.name);
 
     return fs.ensureDir(s)
