@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.38
+
+* Support icon packages
+
 ## 3.0.0-alpha.37
 
 * Ensure that discovery creates source directories
