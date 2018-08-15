@@ -46,7 +46,8 @@ const signale = new Signale({
 
 const DEFAULT_TASKS = {
   'package:discover': require('./tasks/discover.js'),
-  'package:create': require('./tasks/create.js')
+  'package:create': require('./tasks/create.js'),
+  'watch:all': require('./tasks/watch.js')
 };
 
 const loadTasks = (options, args) => {
@@ -77,6 +78,7 @@ const loadTasks = (options, args) => {
 const createOptions = options => Object.assign({
   production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
   cli: path.resolve(options.root, 'src/cli'),
+  npm: path.resolve(options.root, 'package.json'),
   packages: path.resolve(options.root, 'packages.json'),
   dist: {
     root:  path.resolve(options.root, 'dist'),
