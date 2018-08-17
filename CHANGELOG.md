@@ -1,5 +1,10 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.39
+
+* Make sure package discovery does not go deep
+* Added back 'watch:all' task
+
 ## 3.0.0-alpha.38
 
 * Support icon packages
