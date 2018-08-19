@@ -25,7 +25,6 @@
     "fs-extra": "^6.0.1",
     "globby": "^8.0.1",
     "inquirer": "^6.0.0",
-    "is-plain-object": "^2.0.4",
     "minimist": "^1.2.0",
     "signale": "^1.2.1",
     "webpack": "^4.16.5",
