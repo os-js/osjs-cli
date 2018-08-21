@@ -1,5 +1,11 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.40
+
+* Updated dependencies
+* Removed a deprecatd metadata property
+* Removed unused dependency
+
 ## 3.0.0-alpha.39
 
 * Make sure package discovery does not go deep
