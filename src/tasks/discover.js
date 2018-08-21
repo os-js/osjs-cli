@@ -41,12 +41,7 @@ module.exports = async ({logger, options, args}) => {
   const dir = path.resolve(options.root, 'node_modules');
   const packages = await utils.npmPackages(dir);
   const discovery = packages.map(pkg => pkg.filename);
-  const manifest = packages.map(({meta}) => {
-    return Object.assign({
-      _path: meta.name, // TODO: Deprecated
-      type: 'application'
-    }, meta);
-  });
+  const manifest = packages.map(({meta}) => meta);
 
   const roots = {
     theme: options.dist.themes,
