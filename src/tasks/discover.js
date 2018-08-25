@@ -35,11 +35,14 @@ const globby = require('globby');
 const clean = dir => globby(dir, {deep: false, onlyDirectories: true})
   .then(files => Promise.all(files.map(file => fs.unlink(file))));
 
+const getAllPackages = dirs => Promise.all(dirs.map(dir => {
+  return utils.npmPackages(dir);
+})).then(results => [].concat(...results));
+
 module.exports = async ({logger, options, args}) => {
   logger.await('Discovering packages');
 
-  const dir = path.resolve(options.root, 'node_modules');
-  const packages = await utils.npmPackages(dir);
+  const packages = await getAllPackages(options.config.discover);
   const discovery = packages.map(pkg => pkg.filename);
   const manifest = packages.map(({meta}) => meta);
 
@@ -55,7 +58,8 @@ module.exports = async ({logger, options, args}) => {
       : path.resolve(options.dist.packages, pkg.meta.name);
 
     return fs.ensureDir(s)
-      .then(() => fs.ensureSymlink(s, d, 'junction'));
+      .then(() => fs.ensureSymlink(s, d, 'junction'))
+      .catch(err => console.warn(err));
   });
 
   return Promise.resolve()

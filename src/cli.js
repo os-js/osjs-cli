@@ -50,29 +50,16 @@ const DEFAULT_TASKS = {
   'watch:all': require('./tasks/watch.js')
 };
 
-const loadTasks = (options, args) => {
+const loadTasks = (includes, options) => {
   const tasks = Object.assign({}, DEFAULT_TASKS);
-  const logger = signale.scope('osjs-cli');
+  const promises = includes.map(fn => fn(options));
 
-  const loadFile = path.resolve(options.cli, 'index.js');
-  if (fs.existsSync(loadFile)) {
-    try {
-      const includes = require(loadFile);
-      return new Promise((resolve, reject) => {
-        const promises = includes.map(fn => fn(options));
-
-        Promise.all(promises).then(results => {
-          results.forEach(ts => Object.assign(tasks, ts));
-          resolve(tasks);
-        }).catch(reject);
-      });
-    } catch (e) {
-      logger.warn('An error occured while loading tasks');
-      logger.fatal(new Error(e));
-    }
-  }
-
-  return Promise.resolve(tasks);
+  return Promise.all(promises)
+    .then(results => {
+      return results.reduce((list, iter) => {
+        return Object.assign({}, list, iter);
+      }, tasks);
+    });
 };
 
 const createOptions = options => Object.assign({
@@ -80,6 +67,11 @@ const createOptions = options => Object.assign({
   cli: path.resolve(options.root, 'src/cli'),
   npm: path.resolve(options.root, 'package.json'),
   packages: path.resolve(options.root, 'packages.json'),
+  config: {
+    discover: [
+      path.resolve(options.root, 'node_modules')
+    ]
+  },
   dist: {
     root:  path.resolve(options.root, 'dist'),
     themes: path.resolve(options.root, 'dist/themes'),
@@ -90,7 +82,9 @@ const createOptions = options => Object.assign({
 }, options);
 
 const cli = async (argv, opts) => {
+  const logger = signale.scope('osjs-cli');
   const options = createOptions(opts);
+  const loadFile = path.resolve(options.cli, 'index.js');
   const args = minimist(argv);
   const [arg] = args._;
   const error = msg => {
@@ -98,7 +92,29 @@ const cli = async (argv, opts) => {
     process.exit(1);
   };
 
-  loadTasks(options, args).then(tasks => {
+
+  let tasks = [];
+  if (fs.existsSync(loadFile)) {
+    try {
+      const c = require(loadFile);
+
+      if (c instanceof Array) {
+        tasks = c;
+      } else {
+        tasks = c.tasks;
+
+        options.config.discover = [
+          ...options.config.discover,
+          c.discover || []
+        ];
+      }
+    } catch (e) {
+      logger.warn('An error occured while loading cli config');
+      logger.fatal(new Error(e));
+    }
+  }
+
+  loadTasks(tasks, options).then(tasks => {
     if (!arg) {
       error('Available tasks: \n' + Object.keys(tasks).map(t => `- ${t}`).join('\n'));
     } else if (arg in tasks) {
