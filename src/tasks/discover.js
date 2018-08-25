@@ -39,10 +39,23 @@ const getAllPackages = dirs => Promise.all(dirs.map(dir => {
   return utils.npmPackages(dir);
 })).then(results => [].concat(...results));
 
+const unique = (logger, found) => found.filter((value, index, arr) => {
+  const i = arr.findIndex(iter => {
+    return iter.meta.name === value.meta.name;
+  }) === index;
+
+  if (!i) {
+    logger.warn('Found duplicate of', value.meta.name, 'using', path.resolve(value.filename));
+  }
+
+  return i;
+});
+
 module.exports = async ({logger, options, args}) => {
   logger.await('Discovering packages');
 
-  const packages = await getAllPackages(options.config.discover);
+  const found = await getAllPackages(options.config.discover);
+  const packages = unique(logger, found);
   const discovery = packages.map(pkg => pkg.filename);
   const manifest = packages.map(({meta}) => meta);
 
