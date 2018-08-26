@@ -105,7 +105,7 @@ const cli = async (argv, opts) => {
 
         options.config.discover = [
           ...options.config.discover,
-          c.discover || []
+          ...c.discover || []
         ];
       }
     } catch (e) {
