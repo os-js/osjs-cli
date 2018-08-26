@@ -81,6 +81,15 @@ const createOptions = options => Object.assign({
   }
 }, options);
 
+const createDiscoveryPaths = (options, config) => {
+  return [
+    ...options.config.discover,
+    ...config.discover || []
+  ]
+    .map(d => path.resolve(d))
+    .reverse();
+};
+
 const cli = async (argv, opts) => {
   const logger = signale.scope('osjs-cli');
   const options = createOptions(opts);
@@ -103,10 +112,7 @@ const cli = async (argv, opts) => {
       } else {
         tasks = c.tasks;
 
-        options.config.discover = [
-          ...options.config.discover,
-          ...c.discover || []
-        ];
+        options.config.discover = createDiscoveryPaths(options, c);
       }
     } catch (e) {
       logger.warn('An error occured while loading cli config');

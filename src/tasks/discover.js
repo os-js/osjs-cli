@@ -45,7 +45,7 @@ const unique = (logger, found) => found.filter((value, index, arr) => {
   }) === index;
 
   if (!i) {
-    logger.warn('Found duplicate of', value.meta.name, 'using', path.resolve(value.filename));
+    logger.warn('Found duplicate of', value.meta.name);
   }
 
   return i;
@@ -58,6 +58,8 @@ module.exports = async ({logger, options, args}) => {
   const packages = unique(logger, found);
   const discovery = packages.map(pkg => pkg.filename);
   const manifest = packages.map(({meta}) => meta);
+
+  options.config.discover.forEach(d => logger.watch('Using', d));
 
   const roots = {
     theme: options.dist.themes,
