@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.42
+
+* Hotfix for discovery
+
 ## 3.0.0-alpha.41
 
 * Added support for custom CLI config and discovery paths
