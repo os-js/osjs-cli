@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.44
+
+* Minor optimization of discovery
+
 ## 3.0.0-alpha.43
 
 * Improved discovery override
