@@ -83,11 +83,10 @@ const createOptions = options => Object.assign({
 
 const createDiscoveryPaths = (options, config) => {
   return [
-    ...options.config.discover,
-    ...config.discover || []
+    ...config.discover || [],
+    ...options.config.discover
   ]
-    .map(d => path.resolve(d))
-    .reverse();
+    .map(d => path.resolve(d));
 };
 
 const cli = async (argv, opts) => {
