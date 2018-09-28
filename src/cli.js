@@ -44,11 +44,10 @@ const signale = new Signale({
   }
 });
 
-const DEFAULT_TASKS = {
+const DEFAULT_TASKS = Object.assign({
   'package:discover': require('./tasks/discover.js'),
-  'package:create': require('./tasks/create.js'),
   'watch:all': require('./tasks/watch.js')
-};
+}, require('./tasks/scaffold.js'));
 
 const loadTasks = (includes, options) => {
   const tasks = Object.assign({}, DEFAULT_TASKS);
