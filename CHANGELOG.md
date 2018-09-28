@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.46
+
+* npm weirdness workaround
+
 ## 3.0.0-alpha.45
 
 * New scaffolding tools
