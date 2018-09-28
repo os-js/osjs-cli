@@ -31,7 +31,12 @@
 const fs = require('fs-extra');
 const path = require('path');
 const inquirer = require('inquirer');
-const root = path.resolve(__dirname, '../templates');
+const utils = require('../utils.js');
+const templates = path.resolve(__dirname, '../templates');
+
+const filterInput = input => String(input)
+  .replace(/[^A-z0-9_]/g, '')
+  .trim();
 
 const scaffolds = {
   auth: {
@@ -86,7 +91,7 @@ const ask = (type, s) => inquirer.prompt([{
 }, {
   name: 'filename',
   message: 'Name of file',
-  default: 'my-provider.js'
+  default: `my-${s.dirname}.js`
 }, {
   name: 'target',
   message: 'Destination',
@@ -98,6 +103,79 @@ const ask = (type, s) => inquirer.prompt([{
   type: 'confirm',
   message: (answers) => `Are you sure you want to write to '${answers.target}'`
 }]);
+
+const scaffoldPackage = type => async ({logger, options, args}) => {
+  const files = [
+    'index.js',
+    'server.js',
+    'index.scss',
+    'webpack.config.js',
+    'package.json',
+    'metadata.json'
+  ];
+
+  const packages = await utils.npmPackages(
+    path.resolve(options.root, 'node_modules')
+  );
+
+  const promises = (name, dirname) => files.map(filename => {
+    const source = path.resolve(templates, 'application', filename);
+    const destination = path.resolve(dirname, filename);
+
+    return fs.readFile(source, 'utf8')
+      .then(raw => raw.replace(/___NAME___/g, name))
+      .then(contents => fs.writeFile(destination, contents))
+      .then(() => {
+        logger.success('Wrote', filename);
+      });
+  });
+
+  const choices = await inquirer.prompt([{
+    name: 'name',
+    message: 'Enter name of package ([A-z0-9_])',
+    default: 'MyApplication',
+    filter: filterInput,
+    validate: input => {
+      if (input.length < 1) {
+        return Promise.reject('Invalid package name');
+      }
+
+      const found = packages.find(({meta}) => meta.name === input);
+      if (found) {
+        return Promise.reject('A package with this name already exists...');
+      }
+
+      return Promise.resolve(true);
+    }
+  }, {
+    name: 'target',
+    message: 'Destination',
+    default: (answers) => {
+      return `src/packages/${answers.name}`;
+    }
+  }, {
+    name: 'confirm',
+    type: 'confirm',
+    message: (answers) => `Are you sure you want to write to '${answers.target}'`
+  }]);
+
+  if (!choices.confirm) {
+    logger.warn('Scaffolding aborted...');
+    return;
+  }
+
+
+  const destination = path.resolve(options.root, choices.target);
+  const exists = await fs.exists(destination);
+
+  if (exists) {
+    throw new Error('Destination already exists!');
+  }
+
+  await fs.ensureDir(destination);
+
+  return Promise.all(promises(choices.name, destination));
+};
 
 const scaffoldBasic = type => async ({logger, options, args}) => {
   logger.await('Scaffolding', type);
@@ -111,13 +189,13 @@ const scaffoldBasic = type => async ({logger, options, args}) => {
   }
 
   const source = path.resolve(
-    root,
+    templates,
     s.dirname,
     choices.type + '.js'
   );
 
   const destination = path.resolve(
-    process.cwd(),
+    options.root,
     choices.target
   );
 
@@ -131,21 +209,19 @@ const scaffoldBasic = type => async ({logger, options, args}) => {
   const contents = `/*${s.info}*/` + raw;
   await fs.writeFile(destination, contents);
 
-  logger.success('Scaffolding complete...');
+  logger.success('Wrote', path.basename(destination));
 
   console.log(s.info);
 };
-
-const createPackage = require('./create.js');
 
 module.exports = {
   'make:auth': scaffoldBasic('auth'),
   'make:settings': scaffoldBasic('settings'),
   'make:provider': scaffoldBasic('providers'),
   'make:vfs': scaffoldBasic('vfs'),
-  'make:application': createPackage,
+  'make:application': scaffoldPackage('application'),
   'create:package': ({logger, options, args}) => {
     logger.warn('The task \'create:package\' is deprecated, please use \'make*\' tasks instead');
-    return createPackage({logger, options, args});
+    return scaffoldPackage('application')({logger, options, args});
   }
 };
