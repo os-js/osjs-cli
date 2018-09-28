@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.45
+
+* New scaffolding tools
+
 ## 3.0.0-alpha.44
 
 * Minor optimization of discovery
