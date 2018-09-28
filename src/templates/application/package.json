@@ -8,11 +8,6 @@
     "stylelint": "stylelint index.scss src/**/*.scss",
     "prepublishOnly": "npm run eslint && npm run stylelint && rm ./dist/* && npm run build"
   },
-  "files": [
-    "dist/",
-    "server.js",
-    "metadata.json"
-  ],
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.0.0-rc.1",
