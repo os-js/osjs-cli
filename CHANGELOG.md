@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.47
+
+* Improved command-line and task handling
+
 ## 3.0.0-alpha.46
 
 * npm weirdness workaround
