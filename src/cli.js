@@ -81,6 +81,7 @@ const createOptions = options => Object.assign({
   dist: {
     root:  path.resolve(options.root, 'dist'),
     themes: path.resolve(options.root, 'dist/themes'),
+    sounds: path.resolve(options.root, 'dist/sounds'),
     icons: path.resolve(options.root, 'dist/icons'),
     packages: path.resolve(options.root, 'dist/apps'),
     metadata: path.resolve(options.root, 'dist/metadata.json')

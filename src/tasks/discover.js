@@ -63,7 +63,8 @@ const action = async ({logger, options, args}) => {
 
   const roots = {
     theme: options.dist.themes,
-    icons: options.dist.icons
+    icons: options.dist.icons,
+    sounds: options.dist.sounds
   };
 
   const discover = () => packages.map(pkg => {
