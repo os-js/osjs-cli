@@ -106,7 +106,7 @@ const wlog = (logger, cb) => (err, status) => {
 };
 
 
-module.exports = async ({logger, options, args}) => {
+const action = async ({logger, options, args}) => {
   logger.await('Looking up npm packages...');
 
   const print = list => {
@@ -127,4 +127,11 @@ module.exports = async ({logger, options, args}) => {
             .watch({}, wlog(logger, () => print(fileList)));
         });
     });
+};
+
+module.exports = {
+  'watch:all': {
+    description: 'Watch all linked node packages',
+    action
+  }
 };

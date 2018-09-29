@@ -30,9 +30,15 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const minimist = require('minimist');
 const figures = require('figures');
 const {Signale} = require('signale');
+const {version} = require('../package.json');
+const commander = require('commander');
+
+const error = msg => {
+  console.error(msg);
+  process.exit(1);
+};
 
 const signale = new Signale({
   types: {
@@ -44,10 +50,11 @@ const signale = new Signale({
   }
 });
 
-const DEFAULT_TASKS = Object.assign({
-  'package:discover': require('./tasks/discover.js'),
-  'watch:all': require('./tasks/watch.js')
-}, require('./tasks/scaffold.js'));
+const DEFAULT_TASKS = [
+  require('./tasks/watch.js'),
+  require('./tasks/discover.js'),
+  require('./tasks/scaffold.js')
+].reduce((obj, result) => Object.assign({}, result, obj), {});
 
 const loadTasks = (includes, options) => {
   const tasks = Object.assign({}, DEFAULT_TASKS);
@@ -92,13 +99,6 @@ const cli = async (argv, opts) => {
   const logger = signale.scope('osjs-cli');
   const options = createOptions(opts);
   const loadFile = path.resolve(options.cli, 'index.js');
-  const args = minimist(argv);
-  const [arg] = args._;
-  const error = msg => {
-    console.error(msg);
-    process.exit(1);
-  };
-
 
   let tasks = [];
   if (fs.existsSync(loadFile)) {
@@ -118,21 +118,62 @@ const cli = async (argv, opts) => {
     }
   }
 
-  loadTasks(tasks, options).then(tasks => {
-    if (!arg) {
-      error('Available tasks: \n' + Object.keys(tasks).map(t => `- ${t}`).join('\n'));
-    } else if (arg in tasks) {
-      const logger = signale.scope(arg);
+  commander
+    .version(version)
+    .on('command:*', () => {
+      console.error('Invalid command: %s\nSee --help for a list of available commands.', commander.args.join(' '));
+      process.exit(1);
+    })
+    .on('--help', () => {
+      console.log('');
+      console.log('More information:');
+      console.log('- https://manual.os-js.org/v3/guide/cli/');
+    });
 
-      signale.time(arg);
+  loadTasks(tasks, options)
+    .then(tasks => {
+      Object.keys(tasks).forEach(name => {
+        try {
+          const current = commander.command(name);
+          const i = tasks[name];
+          const task = typeof i === 'function'
+            ? {action: i}
+            : i;
 
-      tasks[arg]({logger, options, args})
-        .then(() => signale.timeEnd(arg))
-        .catch(error);
-    } else {
-      error('Invalid command', arg);
-    }
-  }).catch(error);
+          if (task.options) {
+            Object.keys(task.options).forEach(k => {
+              current.option(k, task.options[k]);
+            });
+          }
+
+          if (task.help) {
+            current.on('--help', () => task.help);
+          }
+
+          current
+            .description(task.description)
+            .action((args) => {
+              const logger = signale.scope(name);
+
+              signale.time(name);
+
+              task.action({logger, options, args})
+                .then(() => signale.timeEnd(name))
+                .catch(error);
+            });
+        } catch (e) {
+          signale.warn(e);
+        }
+      });
+
+      if (argv.length < 3) {
+        commander.help();
+        process.exit(1);
+      }
+
+      commander.parse(argv);
+    })
+    .catch(error);
 };
 
 module.exports = cli;

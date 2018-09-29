@@ -51,7 +51,7 @@ const unique = (logger, found) => found.filter((value, index, arr) => {
   return i;
 });
 
-module.exports = async ({logger, options, args}) => {
+const action = async ({logger, options, args}) => {
   logger.await('Discovering packages');
 
   const found = await getAllPackages(options.config.discover);
@@ -90,4 +90,11 @@ module.exports = async ({logger, options, args}) => {
     .then(() => fs.writeJson(options.dist.metadata, manifest))
     .then(() => logger.success(packages.length + ' package(s) discovered.'))
     .then(() => packages.forEach(pkg => logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name)));
+};
+
+module.exports = {
+  'package:discover': {
+    description: 'Discovers all installed OS.js packages',
+    action
+  },
 };

@@ -161,7 +161,7 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
 
   if (!choices.confirm) {
     logger.warn('Scaffolding aborted...');
-    return;
+    return Promise.resolve(true);
   }
 
 
@@ -215,13 +215,31 @@ const scaffoldBasic = type => async ({logger, options, args}) => {
 };
 
 module.exports = {
-  'make:auth': scaffoldBasic('auth'),
-  'make:settings': scaffoldBasic('settings'),
-  'make:provider': scaffoldBasic('providers'),
-  'make:vfs': scaffoldBasic('vfs'),
-  'make:application': scaffoldPackage('application'),
-  'create:package': ({logger, options, args}) => {
-    logger.warn('The task \'create:package\' is deprecated, please use \'make*\' tasks instead');
-    return scaffoldPackage('application')({logger, options, args});
+  'make:auth': {
+    description: 'Create Authentication adapter script',
+    action: scaffoldBasic('auth')
+  },
+  'make:settings': {
+    description: 'Create Settings adapter script',
+    action: scaffoldBasic('settings')
+  },
+  'make:provider': {
+    description: 'Create Service provider script',
+    action: scaffoldBasic('providers')
+  },
+  'make:vfs': {
+    description: 'Create VFS adapter script',
+    action: scaffoldBasic('vfs')
+  },
+  'make:application': {
+    description: 'Create Application package',
+    action: scaffoldPackage('application')
+  },
+  'create:package': {
+    description: '[deprecated] Creates a new package',
+    action: ({logger, options, args}) => {
+      logger.warn('The task \'create:package\' is deprecated, please use \'make*\' tasks instead');
+      return scaffoldPackage('application')({logger, options, args});
+    }
   }
 };

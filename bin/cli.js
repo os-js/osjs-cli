@@ -32,4 +32,4 @@
 const {cli} = require('../index.js');
 const root = process.cwd();
 
-cli(process.argv.slice(2), {root});
+cli(process.argv, {root});
