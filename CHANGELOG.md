@@ -1,5 +1,10 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.48
+
+* Fixed application webpack config template
+* Added sound package discovery support
+
 ## 3.0.0-alpha.47
 
 * Improved command-line and task handling
