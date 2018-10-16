@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.49
+
+* Updated 'make:application' scaffolding
+
 ## 3.0.0-alpha.48
 
 * Fixed application webpack config template
