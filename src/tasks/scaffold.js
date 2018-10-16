@@ -46,6 +46,7 @@ const scaffolds = {
 For more information about authentication adapters, visit:
 - https://manual.os-js.org/v3/tutorial/auth/
 - https://manual.os-js.org/v3/guide/auth/
+- https://manual.os-js.org/v3/development/
 `
   },
   settings: {
@@ -55,6 +56,7 @@ For more information about authentication adapters, visit:
 For more information about settings adapters, visit:
 - https://manual.os-js.org/v3/tutorial/settings/
 - https://manual.os-js.org/v3/guide/settings/
+- https://manual.os-js.org/v3/development/
 `
   },
   vfs: {
@@ -64,6 +66,7 @@ For more information about settings adapters, visit:
 For more information about vfs adapters, visit:
 - https://manual.os-js.org/v3/tutorial/vfs/
 - https://manual.os-js.org/v3/guide/filesystem/
+- https://manual.os-js.org/v3/development/
 `
   },
   providers: {
@@ -73,6 +76,7 @@ For more information about vfs adapters, visit:
 For more information about service providers, visit:
 - https://manual.os-js.org/v3/tutorial/provider/
 - https://manual.os-js.org/v3/guide/provider/
+- https://manual.os-js.org/v3/development/
 `
   }
 };
@@ -174,7 +178,25 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
 
   await fs.ensureDir(destination);
 
-  return Promise.all(promises(choices.name, destination));
+  return Promise.all(promises(choices.name, destination))
+    .then(() => logger.await('Running "npm install"'))
+    .then(() => utils.spawnAsync('npm', ['install'], {cwd: destination}))
+    .then(() => logger.success('...dependencies installed'))
+    .then(() => logger.await('Running "npm run build"'))
+    .then(() => utils.spawnAsync('npm', ['run', 'build'], {cwd: destination}))
+    .then(() => logger.success('...build complete'))
+    .then(() => {
+      logger.info('Package was generated and built.');
+      logger.info('Run "npm run package:discover" to make it available.');
+
+      console.log(`
+For more information about packages, visit:
+
+- https://manual.os-js.org/v3/resource/overview/
+- https://manual.os-js.org/v3/tutorial/theme/
+- https://manual.os-js.org/v3/development/
+      `);
+    });
 };
 
 const scaffoldBasic = type => async ({logger, options, args}) => {
