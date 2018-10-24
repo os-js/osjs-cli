@@ -1,4 +1,3 @@
-import './index.scss';
 import {name as applicationName} from './metadata.json';
 
 // Our launcher
