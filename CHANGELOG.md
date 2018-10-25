@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.0-alpha.51
+
+* Updated application template
+
 ## 3.0.0-alpha.50
 
 * Updated application template
