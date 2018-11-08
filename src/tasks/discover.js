@@ -33,7 +33,12 @@ const fs = require('fs-extra');
 const globby = require('globby');
 
 const clean = dir => globby(dir, {deep: false, onlyDirectories: true})
-  .then(files => Promise.all(files.map(file => fs.unlink(file))));
+  .then(files => Promise.all(files.map(file => {
+    return fs.unlink(file)
+      .catch(err => {
+        console.warn(err);
+      });
+  })));
 
 const getAllPackages = dirs => Promise.all(dirs.map(dir => {
   return utils.npmPackages(dir);
