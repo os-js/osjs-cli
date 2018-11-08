@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.1
+
+* Don't abort on package discover cleaning (unlink)
+
 ## 3.0.0-alpha.51
 
 * Updated application template
