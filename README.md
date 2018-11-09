@@ -14,5 +14,3 @@
 This is the node module required to build OS.js and any of its packages, themes, etc.
 
 [![Build Status](https://travis-ci.org/os-js/osjs-cli.svg?branch=master)](https://travis-ci.org/os-js/osjs-cli)
-
-**PLEASE NOTE THAT THIS IS AN ALPHA PRE-RELEASE AND SUBJECT TO CHANGE WITHOUT NOTICE**
