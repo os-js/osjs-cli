@@ -1,5 +1,10 @@
 # Changelog for osjs-cli
 
+## 3.0.3
+
+* Discovery file now writes relative paths
+* Added support for custom paths in discovery task
+
 ## 3.0.2
 
 * Added '--copy' option to 'package:discover'
