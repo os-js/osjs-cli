@@ -69,7 +69,8 @@ const action = async ({logger, options, args, commander}) => {
   const copyFiles = args.copy === true;
   const found = await getAllPackages(options.config.discover);
   const packages = unique(logger, found);
-  const discovery = packages.map(pkg => pkg.filename);
+  const discovery = packages.map(pkg => pkg.filename)
+    .map(filename => path.relative(options.root, filename));
   const manifest = packages.map(({meta}) => meta);
   const discoveryDest = path.resolve(
     args.discover || options.packages
