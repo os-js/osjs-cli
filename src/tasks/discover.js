@@ -32,11 +32,17 @@ const path = require('path');
 const fs = require('fs-extra');
 const globby = require('globby');
 
-const clean = dir => globby(dir, {deep: false, onlyDirectories: true})
+const isSymlink = file => fs.lstat(file)
+  .then(stat => stat.isSymbolicLink());
+
+const clean = (copyFiles, dir) => globby(dir, {deep: false, onlyDirectories: true})
   .then(files => Promise.all(files.map(file => {
-    return fs.unlink(file)
-      .catch(err => {
-        console.warn(err);
+    return isSymlink(file)
+      .then(sym => {
+        return (sym ? fs.unlink(file) : fs.remove(file))
+          .catch(err => {
+            console.warn(err);
+          });
       });
   })));
 
@@ -59,6 +65,7 @@ const unique = (logger, found) => found.filter((value, index, arr) => {
 const action = async ({logger, options, args}) => {
   logger.await('Discovering packages');
 
+  const copyFiles = args.copy === true;
   const found = await getAllPackages(options.config.discover);
   const packages = unique(logger, found);
   const discovery = packages.map(pkg => pkg.filename);
@@ -79,7 +86,11 @@ const action = async ({logger, options, args}) => {
       : path.resolve(options.dist.packages, pkg.meta.name);
 
     return fs.ensureDir(s)
-      .then(() => fs.ensureSymlink(s, d, 'junction'))
+      .then(() => {
+        return copyFiles
+          ? fs.copy(s, d)
+          : fs.ensureSymlink(s, d, 'junction');
+      })
       .catch(err => console.warn(err));
   });
 
@@ -88,19 +99,22 @@ const action = async ({logger, options, args}) => {
     .then(() => fs.ensureDir(options.dist.root))
     .then(() => fs.ensureDir(options.dist.themes))
     .then(() => fs.ensureDir(options.dist.packages))
-    .then(() => clean(options.dist.themes))
-    .then(() => clean(options.dist.packages))
+    .then(() => clean(copyFiles, options.dist.themes))
+    .then(() => clean(copyFiles, options.dist.packages))
     .then(() => logger.await('Discovering packages'))
     .then(() => Promise.all(discover()))
     .then(() => fs.writeJson(options.packages, discovery))
     .then(() => fs.writeJson(options.dist.metadata, manifest))
     .then(() => logger.success(packages.length + ' package(s) discovered.'))
-    .then(() => packages.forEach(pkg => logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name)));
+    .then(() => packages.forEach(pkg => logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name, `[${copyFiles ? 'copy' : 'symlink'}]`)));
 };
 
 module.exports = {
   'package:discover': {
     description: 'Discovers all installed OS.js packages',
+    options: {
+      '--copy': 'Copy files instead of creating symlinks'
+    },
     action
   },
 };
