@@ -68,25 +68,31 @@ const loadTasks = (includes, options) => {
     });
 };
 
-const createOptions = options => Object.assign({
-  production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
-  cli: path.resolve(options.root, 'src/cli'),
-  npm: path.resolve(options.root, 'package.json'),
-  packages: path.resolve(options.root, 'packages.json'),
-  config: {
-    discover: [
-      path.resolve(options.root, 'node_modules')
-    ]
-  },
-  dist: {
-    root:  path.resolve(options.root, 'dist'),
-    themes: path.resolve(options.root, 'dist/themes'),
-    sounds: path.resolve(options.root, 'dist/sounds'),
-    icons: path.resolve(options.root, 'dist/icons'),
-    packages: path.resolve(options.root, 'dist/apps'),
-    metadata: path.resolve(options.root, 'dist/metadata.json')
-  }
-}, options);
+const createOptions = options => {
+  return Object.assign({
+    production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
+    cli: path.resolve(options.root, 'src/cli'),
+    npm: path.resolve(options.root, 'package.json'),
+    packages: path.resolve(options.root, 'packages.json'),
+    config: {
+      discover: [
+        path.resolve(options.root, 'node_modules')
+      ]
+    },
+    dist: () => {
+      const root = commander.dist ? path.resolve(commander.dist) : path.resolve(options.root, 'dist');
+
+      return {
+        root,
+        themes: path.resolve(root, 'themes'),
+        sounds: path.resolve(root, 'sounds'),
+        icons: path.resolve(root, 'icons'),
+        packages: path.resolve(root, 'apps'),
+        metadata: path.resolve(root, 'metadata.json')
+      };
+    }
+  }, options);
+};
 
 const createDiscoveryPaths = (options, config) => {
   return [
@@ -97,6 +103,19 @@ const createDiscoveryPaths = (options, config) => {
 };
 
 const cli = async (argv, opts) => {
+  commander
+    .version(version)
+    .option('--dist [dist]', 'Target dist directory (\'dist/\' by default)')
+    .on('command:*', () => {
+      console.error('Invalid command: %s\nSee --help for a list of available commands.', commander.args.join(' '));
+      process.exit(1);
+    })
+    .on('--help', () => {
+      console.log('');
+      console.log('More information:');
+      console.log('- https://manual.os-js.org/v3/guide/cli/');
+    });
+
   const logger = signale.scope('osjs-cli');
   const options = createOptions(opts);
   const loadFile = path.resolve(options.cli, 'index.js');
@@ -118,18 +137,6 @@ const cli = async (argv, opts) => {
       logger.fatal(new Error(e));
     }
   }
-
-  commander
-    .version(version)
-    .on('command:*', () => {
-      console.error('Invalid command: %s\nSee --help for a list of available commands.', commander.args.join(' '));
-      process.exit(1);
-    })
-    .on('--help', () => {
-      console.log('');
-      console.log('More information:');
-      console.log('- https://manual.os-js.org/v3/guide/cli/');
-    });
 
   loadTasks(tasks, options)
     .then(tasks => {
@@ -155,10 +162,9 @@ const cli = async (argv, opts) => {
             .description(task.description)
             .action((args) => {
               const logger = signale.scope(name);
-
               signale.time(name);
 
-              task.action({logger, options, args})
+              task.action({logger, options, args, commander})
                 .then(() => signale.timeEnd(name))
                 .catch(error);
             });

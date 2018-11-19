@@ -62,28 +62,35 @@ const unique = (logger, found) => found.filter((value, index, arr) => {
   return i;
 });
 
-const action = async ({logger, options, args}) => {
+const action = async ({logger, options, args, commander}) => {
   logger.await('Discovering packages');
 
+  const dist = options.dist();
   const copyFiles = args.copy === true;
   const found = await getAllPackages(options.config.discover);
   const packages = unique(logger, found);
   const discovery = packages.map(pkg => pkg.filename);
   const manifest = packages.map(({meta}) => meta);
+  const discoveryDest = path.resolve(
+    args.discover || options.packages
+  );
+
+  logger.info('Using', discoveryDest);
+  logger.info('Using', dist.root);
 
   options.config.discover.forEach(d => logger.watch('Using', d));
 
   const roots = {
-    theme: options.dist.themes,
-    icons: options.dist.icons,
-    sounds: options.dist.sounds
+    theme: dist.themes,
+    icons: dist.icons,
+    sounds: dist.sounds
   };
 
   const discover = () => packages.map(pkg => {
     const s = path.resolve(pkg.filename, 'dist');
     const d = roots[pkg.meta.type]
       ? path.resolve(roots[pkg.meta.type], pkg.meta.name)
-      : path.resolve(options.dist.packages, pkg.meta.name);
+      : path.resolve(dist.packages, pkg.meta.name);
 
     return fs.ensureDir(s)
       .then(() => {
@@ -96,15 +103,15 @@ const action = async ({logger, options, args}) => {
 
   return Promise.resolve()
     .then(() => logger.await('Flushing out old discoveries'))
-    .then(() => fs.ensureDir(options.dist.root))
-    .then(() => fs.ensureDir(options.dist.themes))
-    .then(() => fs.ensureDir(options.dist.packages))
-    .then(() => clean(copyFiles, options.dist.themes))
-    .then(() => clean(copyFiles, options.dist.packages))
+    .then(() => fs.ensureDir(dist.root))
+    .then(() => fs.ensureDir(dist.themes))
+    .then(() => fs.ensureDir(dist.packages))
+    .then(() => clean(copyFiles, dist.themes))
+    .then(() => clean(copyFiles, dist.packages))
     .then(() => logger.await('Discovering packages'))
     .then(() => Promise.all(discover()))
-    .then(() => fs.writeJson(options.packages, discovery))
-    .then(() => fs.writeJson(options.dist.metadata, manifest))
+    .then(() => fs.writeJson(discoveryDest, discovery))
+    .then(() => fs.writeJson(dist.metadata, manifest))
     .then(() => logger.success(packages.length + ' package(s) discovered.'))
     .then(() => packages.forEach(pkg => logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name, `[${copyFiles ? 'copy' : 'symlink'}]`)));
 };
@@ -113,7 +120,8 @@ module.exports = {
   'package:discover': {
     description: 'Discovers all installed OS.js packages',
     options: {
-      '--copy': 'Copy files instead of creating symlinks'
+      '--copy': 'Copy files instead of creating symlinks',
+      '--discover [discover]': 'Discovery output file (\'packages.json\' by default)'
     },
     action
   },
