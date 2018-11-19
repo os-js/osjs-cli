@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.2
+
+* Added '--copy' option to 'package:discover'
+
 ## 3.0.1
 
 * Don't abort on package discover cleaning (unlink)
