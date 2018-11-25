@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.4
+
+* Updated application template
+
 ## 3.0.3
 
 * Discovery file now writes relative paths
