@@ -21,6 +21,9 @@ module.exports = {
     path.resolve(__dirname, 'index.js'),
     path.resolve(__dirname, 'index.scss')
   ],
+  externals: {
+    osjs: 'OSjs'
+  },
   optimization: {
     minimize,
   },
