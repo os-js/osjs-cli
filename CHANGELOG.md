@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.5
+
+* Added overwrite/replace confirm to 'make:application' (#6)
+
 ## 3.0.4
 
 * Updated application template
