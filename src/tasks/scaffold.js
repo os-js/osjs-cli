@@ -122,15 +122,23 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
     path.resolve(options.root, 'node_modules')
   );
 
-  const promises = (name, dirname) => files.map(filename => {
+  const promises = (name, dirname, replace) => files.map(filename => {
     const source = path.resolve(templates, 'application', filename);
     const destination = path.resolve(dirname, filename);
 
-    return fs.readFile(source, 'utf8')
-      .then(raw => raw.replace(/___NAME___/g, name))
-      .then(contents => fs.writeFile(destination, contents))
-      .then(() => {
-        logger.success('Wrote', filename);
+    return fs.exists(destination)
+      .then(exists => {
+        if (exists && !replace) {
+          logger.info('Skipping', filename);
+          return true;
+        }
+
+        return fs.readFile(source, 'utf8')
+          .then(raw => raw.replace(/___NAME___/g, name))
+          .then(contents => fs.writeFile(destination, contents))
+          .then(() => {
+            logger.success('Wrote', filename);
+          });
       });
   });
 
@@ -171,14 +179,36 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
 
   const destination = path.resolve(options.root, choices.target);
   const exists = await fs.exists(destination);
+  let replace = true;
 
   if (exists) {
-    throw new Error('Destination already exists!');
+    logger.warn('Target directory already exists');
+
+    const {overwrite} = await inquirer.prompt([{
+      type: 'confirm',
+      name: 'overwrite',
+      message: 'Do you want to overwrite existing directory?',
+      default: false
+    }]);
+
+    if (!overwrite) {
+      throw new Error('Aborted by user!');
+    }
+
+    const a = await inquirer.prompt([{
+      type: 'confirm',
+      name: 'replace',
+      message: 'Do you want to overwrite existing files?',
+      default: false
+    }]);
+
+    replace = a.replace;
   }
+
 
   await fs.ensureDir(destination);
 
-  return Promise.all(promises(choices.name, destination))
+  return Promise.all(promises(choices.name, destination, replace))
     .then(() => logger.await('Running "npm install"'))
     .then(() => utils.spawnAsync('npm', ['install'], {cwd: destination}))
     .then(() => logger.success('...dependencies installed'))
