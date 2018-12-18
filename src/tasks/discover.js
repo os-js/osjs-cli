@@ -50,6 +50,25 @@ const getAllPackages = dirs => Promise.all(dirs.map(dir => {
   return utils.npmPackages(dir);
 })).then(results => [].concat(...results));
 
+const removeSoftDeleted = (logger, disabled) => iter => {
+  if (disabled.indexOf(iter.meta.name) !== -1) {
+    logger.note(iter.meta.name, 'was disabled by config');
+    return false;
+  }
+
+  if (iter.filename.toLowerCase().match(/\.disabled$/)) {
+    logger.note(iter.meta.name, 'was disabled by directory suffix');
+    return false;
+  }
+
+  if (iter.meta.disabled === true) {
+    logger.note(iter.meta.name, 'was disabled in metadata');
+    return false;
+  }
+
+  return true;
+};
+
 const unique = (logger, found) => found.filter((value, index, arr) => {
   const i = arr.findIndex(iter => {
     return iter.meta.name === value.meta.name;
@@ -68,7 +87,8 @@ const action = async ({logger, options, args, commander}) => {
   const dist = options.dist();
   const copyFiles = args.copy === true;
   const found = await getAllPackages(options.config.discover);
-  const packages = unique(logger, found);
+  const packages = unique(logger, found)
+    .filter(removeSoftDeleted(logger, options.config.disabled));
   const discovery = packages.map(pkg => pkg.filename)
     .map(filename => path.relative(options.root, filename));
   const manifest = packages.map(({meta}) => meta);

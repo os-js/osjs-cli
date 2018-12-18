@@ -131,6 +131,7 @@ const cli = async (argv, opts) => {
         tasks = c.tasks;
 
         options.config.discover = createDiscoveryPaths(options, c);
+        options.config.disabled = c.disabled || [];
       }
     } catch (e) {
       logger.warn('An error occured while loading cli config');
