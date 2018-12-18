@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.6
+
+* Added support for 'soft deleting' packages
+
 ## 3.0.5
 
 * Added overwrite/replace confirm to 'make:application' (#6)
