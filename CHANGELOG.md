@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.7
+
+* Updated application scaffolding template
+
 ## 3.0.6
 
 * Added support for 'soft deleting' packages
