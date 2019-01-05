@@ -1,5 +1,11 @@
 # Changelog for osjs-cli
 
+## 3.0.8
+
+* Updated README
+* Removed unused dependency
+* Updated dependencies
+
 ## 3.0.7
 
 * Updated application scaffolding template
