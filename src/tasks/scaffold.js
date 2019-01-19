@@ -110,6 +110,7 @@ const ask = (type, s) => inquirer.prompt([{
 
 const scaffoldPackage = type => async ({logger, options, args}) => {
   const files = [
+    '.babelrc',
     'index.js',
     'server.js',
     'index.scss',
