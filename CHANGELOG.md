@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.11
+
+* Updated package discovery depth
+
 ## 3.0.10
 
 * Added babelrc to application template
