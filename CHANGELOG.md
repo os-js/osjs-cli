@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.12
+
+* Fixed app scaffolding on Windows
+
 ## 3.0.11
 
 * Updated package discovery depth
