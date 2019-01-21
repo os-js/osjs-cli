@@ -34,6 +34,9 @@ const inquirer = require('inquirer');
 const utils = require('../utils.js');
 const templates = path.resolve(__dirname, '../templates');
 
+const isWindows = /^win/.test(process.platform);
+const npmBinary = isWindows ? 'npm.cmd' : 'npm';
+
 const filterInput = input => String(input)
   .replace(/[^A-z0-9_]/g, '')
   .trim();
@@ -211,10 +214,10 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
 
   return Promise.all(promises(choices.name, destination, replace))
     .then(() => logger.await('Running "npm install"'))
-    .then(() => utils.spawnAsync('npm', ['install'], {cwd: destination}))
+    .then(() => utils.spawnAsync(npmBinary, ['install'], {cwd: destination}))
     .then(() => logger.success('...dependencies installed'))
     .then(() => logger.await('Running "npm run build"'))
-    .then(() => utils.spawnAsync('npm', ['run', 'build'], {cwd: destination}))
+    .then(() => utils.spawnAsync(npmBinary, ['run', 'build'], {cwd: destination}))
     .then(() => logger.success('...build complete'))
     .then(() => {
       logger.info('Package was generated and built.');
