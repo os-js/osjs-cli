@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.13
+
+* Updated application template
+
 ## 3.0.12
 
 * Fixed app scaffolding on Windows
