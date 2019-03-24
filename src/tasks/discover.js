@@ -86,6 +86,7 @@ const action = async ({logger, options, args, commander}) => {
 
   const dist = options.dist();
   const copyFiles = args.copy === true;
+  const relativeSymlinks = !copyFiles && args.relative === true;
   const found = await getAllPackages(options.config.discover);
   const packages = unique(logger, found)
     .filter(removeSoftDeleted(logger, options.config.disabled));
@@ -108,10 +109,14 @@ const action = async ({logger, options, args, commander}) => {
   };
 
   const discover = () => packages.map(pkg => {
-    const s = path.resolve(pkg.filename, 'dist');
     const d = roots[pkg.meta.type]
       ? path.resolve(roots[pkg.meta.type], pkg.meta.name)
       : path.resolve(dist.packages, pkg.meta.name);
+
+    let s = path.resolve(pkg.filename, 'dist');
+    if (relativeSymlinks) {
+      s = path.relative(options.root, s);
+    }
 
     return fs.ensureDir(s)
       .then(() => {
@@ -142,6 +147,7 @@ module.exports = {
     description: 'Discovers all installed OS.js packages',
     options: {
       '--copy': 'Copy files instead of creating symlinks',
+      '--relative': 'Use relative paths for symlinks',
       '--discover [discover]': 'Discovery output file (\'packages.json\' by default)'
     },
     action
