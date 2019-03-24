@@ -1,5 +1,10 @@
 # Changelog for osjs-cli
 
+## 3.0.14
+
+* Updated dependencies
+* Add support for relative symlinks in package discovery (fixes #10)
+
 ## 3.0.13
 
 * Updated application template
