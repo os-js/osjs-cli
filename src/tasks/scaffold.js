@@ -112,14 +112,21 @@ const ask = (type, s) => inquirer.prompt([{
 }]);
 
 const scaffoldPackage = type => async ({logger, options, args}) => {
+  const defaultName = type === 'iframe-application'
+    ? 'MyIframeApplication'
+    : 'MyApplication';
+
+  const additions = type === 'iframe-application'
+    ? ['data/index.html']
+    : ['server.js', 'index.scss'];
+
   const files = [
     '.babelrc',
     'index.js',
-    'server.js',
-    'index.scss',
     'webpack.config.js',
     'package.json',
-    'metadata.json'
+    'metadata.json',
+    ...additions
   ];
 
   const packages = await utils.npmPackages(
@@ -127,7 +134,7 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
   );
 
   const promises = (name, dirname, replace) => files.map(filename => {
-    const source = path.resolve(templates, 'application', filename);
+    const source = path.resolve(templates, type, filename);
     const destination = path.resolve(dirname, filename);
 
     return fs.exists(destination)
@@ -137,7 +144,8 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
           return true;
         }
 
-        return fs.readFile(source, 'utf8')
+        return fs.ensureDir(path.dirname(destination))
+          .then(() => fs.readFile(source, 'utf8'))
           .then(raw => raw.replace(/___NAME___/g, name))
           .then(contents => fs.writeFile(destination, contents))
           .then(() => {
@@ -149,7 +157,7 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
   const choices = await inquirer.prompt([{
     name: 'name',
     message: 'Enter name of package ([A-z0-9_])',
-    default: 'MyApplication',
+    default: defaultName,
     filter: filterInput,
     validate: input => {
       if (input.length < 1) {
@@ -229,6 +237,7 @@ For more information about packages, visit:
 - https://manual.os-js.org/v3/resource/overview/
 - https://manual.os-js.org/v3/tutorial/theme/
 - https://manual.os-js.org/v3/development/
+- https://manual.os-js.org/v3/tutorial/iframe/
       `);
     });
 };
@@ -290,6 +299,10 @@ module.exports = {
   'make:application': {
     description: 'Create Application package',
     action: scaffoldPackage('application')
+  },
+  'make:iframe-application': {
+    description: 'Create IFrame Application package',
+    action: scaffoldPackage('iframe-application')
   },
   'create:package': {
     description: '[deprecated] Creates a new package',

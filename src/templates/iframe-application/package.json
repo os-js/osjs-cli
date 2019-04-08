@@ -1,0 +1,25 @@
+{
+  "name": "___NAME___",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "eslint": "eslint *.js",
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "prepublishOnly": "npm run eslint && rm ./dist/* && npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/runtime": "^7.2.0",
+    "babel-loader": "^8.0.5",
+    "copy-webpack-plugin": "^4.5.2",
+    "eslint": "^5.12.1",
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1"
+  },
+  "osjs": {
+    "type": "package"
+  }
+}

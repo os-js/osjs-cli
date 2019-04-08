@@ -1,0 +1,15 @@
+{
+  "type": "application",
+  "name": "___NAME___",
+  "category": null,
+  "server": null,
+  "title": {
+    "en_EN": "___NAME___"
+  },
+  "description": {
+    "en_EN": "___NAME___"
+  },
+  "files": [
+    "main.js"
+  ]
+}
