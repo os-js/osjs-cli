@@ -1,5 +1,11 @@
 # Changelog for osjs-cli
 
+## 3.0.15
+
+* Updated dependencies
+* Updated application scaffold template
+* Added 'iframe-application' template and scaffold task
+
 ## 3.0.14
 
 * Updated dependencies
