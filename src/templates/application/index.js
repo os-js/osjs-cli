@@ -1,3 +1,4 @@
+import './index.scss';
 import osjs from 'osjs';
 import {name as applicationName} from './metadata.json';
 

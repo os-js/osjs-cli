@@ -17,10 +17,7 @@ if (mode === 'production') {
 module.exports = {
   mode,
   devtool: 'source-map',
-  entry: [
-    path.resolve(__dirname, 'index.js'),
-    path.resolve(__dirname, 'index.scss')
-  ],
+  entry: path.resolve(__dirname, 'index.js'),
   externals: {
     osjs: 'OSjs'
   },
