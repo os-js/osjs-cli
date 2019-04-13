@@ -52,43 +52,45 @@ const getAllPackages = dirs => Promise.all(dirs.map(dir => {
 
 const removeSoftDeleted = (logger, disabled) => iter => {
   if (disabled.indexOf(iter.meta.name) !== -1) {
-    logger.note(iter.meta.name, 'was disabled by config');
+    logger.warn(iter.meta.name, 'was disabled by config');
     return false;
   }
 
   if (iter.filename.toLowerCase().match(/\.disabled$/)) {
-    logger.note(iter.meta.name, 'was disabled by directory suffix');
+    logger.warn(iter.meta.name, 'was disabled by directory suffix');
     return false;
   }
 
   if (iter.meta.disabled === true) {
-    logger.note(iter.meta.name, 'was disabled in metadata');
+    logger.warn(iter.meta.name, 'was disabled in metadata');
     return false;
   }
 
   return true;
 };
 
-const unique = (logger, found) => found.filter((value, index, arr) => {
-  const i = arr.findIndex(iter => {
+const uniqueFn = condition => (value, index, arr) => {
+  const result = arr.findIndex(iter => {
     return iter.meta.name === value.meta.name;
   }) === index;
 
-  if (!i) {
-    logger.warn('Found duplicate of', value.meta.name);
-  }
-
-  return i;
-});
+  return condition ? result : !result;
+};
 
 const action = async ({logger, options, args, commander}) => {
-  logger.await('Discovering packages');
-
   const dist = options.dist();
   const copyFiles = args.copy === true;
   const relativeSymlinks = !copyFiles && args.relative === true;
   const found = await getAllPackages(options.config.discover);
-  const packages = unique(logger, found)
+
+  const dupes = found.filter(uniqueFn(false));
+  if (dupes.length > 0) {
+    logger.warn('Duplicate packages were discovered!');
+    logger.log(`A total of ${dupes.length} duplicates:`);
+    dupes.forEach(pkg => logger.log(` > ${pkg.meta.name}`));
+  }
+
+  const packages = found.filter(uniqueFn(true))
     .filter(removeSoftDeleted(logger, options.config.disabled));
   const discovery = packages.map(pkg => pkg.filename)
     .map(filename => path.relative(options.root, filename));
@@ -97,10 +99,11 @@ const action = async ({logger, options, args, commander}) => {
     args.discover || options.packages
   );
 
-  logger.info('Using', discoveryDest);
-  logger.info('Using', dist.root);
+  logger.info('Destination discovery map', discoveryDest);
+  logger.info('Destination path', dist.root);
+  logger.info('Destination manifest', dist.metadata);
 
-  options.config.discover.forEach(d => logger.watch('Using', d));
+  options.config.discover.forEach(d => logger.info('Including', d));
 
   const roots = {
     theme: dist.themes,
@@ -128,18 +131,20 @@ const action = async ({logger, options, args, commander}) => {
   });
 
   return Promise.resolve()
-    .then(() => logger.await('Flushing out old discoveries'))
+    .then(() => logger.info('Flushing out old discoveries'))
     .then(() => fs.ensureDir(dist.root))
     .then(() => fs.ensureDir(dist.themes))
     .then(() => fs.ensureDir(dist.packages))
     .then(() => clean(copyFiles, dist.themes))
     .then(() => clean(copyFiles, dist.packages))
-    .then(() => logger.await('Discovering packages'))
+    .then(() => logger.info('Discovering packages'))
     .then(() => Promise.all(discover()))
     .then(() => fs.writeJson(discoveryDest, discovery))
     .then(() => fs.writeJson(dist.metadata, manifest))
-    .then(() => logger.success(packages.length + ' package(s) discovered.'))
-    .then(() => packages.forEach(pkg => logger.info('Discovered', pkg.json.name, 'as', pkg.meta.name, `[${copyFiles ? 'copy' : 'symlink'}]`)));
+    .then(() => packages.forEach(pkg => {
+      logger.log(`[${copyFiles ? 'copy' : 'symlink'}] ${pkg.json.name} as ${pkg.meta.name}`);
+    }))
+    .then(() => logger.success(packages.length + ' package(s) discovered.'));
 };
 
 module.exports = {

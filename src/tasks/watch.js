@@ -107,7 +107,7 @@ const wlog = (logger, cb) => (err, status) => {
 
 
 const action = async ({logger, options, args}) => {
-  logger.await('Looking up npm packages...');
+  logger.info('Looking up npm packages...');
 
   const print = list => {
     list.forEach(filename => logger.info(`Watching ${filename}`));

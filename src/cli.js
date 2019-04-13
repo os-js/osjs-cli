@@ -30,8 +30,7 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const figures = require('figures');
-const {Signale} = require('signale');
+const consola = require('consola');
 const {version} = require('../package.json');
 const commander = require('commander');
 
@@ -39,16 +38,6 @@ const error = msg => {
   console.error(msg);
   process.exit(1);
 };
-
-const signale = new Signale({
-  types: {
-    found: {
-      badge: figures.play,
-      color: 'green',
-      label: 'found'
-    }
-  }
-});
 
 const DEFAULT_TASKS = [
   require('./tasks/watch.js'),
@@ -116,7 +105,6 @@ const cli = async (argv, opts) => {
       console.log('- https://manual.os-js.org/v3/guide/cli/');
     });
 
-  const logger = signale.scope('osjs-cli');
   const options = createOptions(opts);
   const loadFile = path.resolve(options.cli, 'index.js');
 
@@ -134,8 +122,8 @@ const cli = async (argv, opts) => {
         options.config.disabled = c.disabled || [];
       }
     } catch (e) {
-      logger.warn('An error occured while loading cli config');
-      logger.fatal(new Error(e));
+      consola.warn('An error occured while loading cli config');
+      consola.fatal(new Error(e));
     }
   }
 
@@ -162,15 +150,18 @@ const cli = async (argv, opts) => {
           current
             .description(task.description)
             .action((args) => {
-              const logger = signale.scope(name);
-              signale.time(name);
+              const logger = consola.withTag(name);
+              const started = new Date();
 
               task.action({logger, options, args, commander})
-                .then(() => signale.timeEnd(name))
+                .then(() => {
+                  const diff = new Date() - started;
+                  consola.success(`Finished in ${diff}ms`);
+                })
                 .catch(error);
             });
         } catch (e) {
-          signale.warn(e);
+          consola.warn(e);
         }
       });
 

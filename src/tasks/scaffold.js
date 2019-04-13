@@ -221,10 +221,10 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
   await fs.ensureDir(destination);
 
   return Promise.all(promises(choices.name, destination, replace))
-    .then(() => logger.await('Running "npm install"'))
+    .then(() => logger.info('Running "npm install"'))
     .then(() => utils.spawnAsync(npmBinary, ['install'], {cwd: destination}))
     .then(() => logger.success('...dependencies installed'))
-    .then(() => logger.await('Running "npm run build"'))
+    .then(() => logger.info('Running "npm run build"'))
     .then(() => utils.spawnAsync(npmBinary, ['run', 'build'], {cwd: destination}))
     .then(() => logger.success('...build complete'))
     .then(() => {
@@ -243,13 +243,13 @@ For more information about packages, visit:
 };
 
 const scaffoldBasic = type => async ({logger, options, args}) => {
-  logger.await('Scaffolding', type);
+  logger.info('Scaffolding', type);
 
   const s = scaffolds[type];
   const choices = await ask(type, s);
 
   if (!choices.confirm) {
-    logger.warn('Scaffolding aborted...');
+    logger.info('Scaffolding aborted...');
     return;
   }
 
