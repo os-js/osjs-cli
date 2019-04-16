@@ -1,5 +1,12 @@
 # Changelog for osjs-cli
 
+## 3.0.16
+
+* Updated dependencies
+* Updated Auth adapter scaffolding templates
+* Updated dependencies for scaffolding templates
+* Replaced signale with consola and updated logging
+
 ## 3.0.15
 
 * Updated dependencies

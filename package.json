@@ -1,6 +1,6 @@
 {
   "name": "@osjs/cli",
-  "version": "3.0.15",
+  "version": "3.0.16",
   "description": "OS.js v3 CLI",
   "main": "index.js",
   "scripts": {
