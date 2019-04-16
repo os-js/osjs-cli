@@ -8,6 +8,10 @@ const myAdapter = (core, config) => ({
   logout: () => {
     // And perform special operations on logout
     return Promise.resolve(true);
+  },
+
+  register: values => {
+    return Promise.reject(new Error('Registration not available'));
   }
 });
 

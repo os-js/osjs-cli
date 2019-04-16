@@ -12,5 +12,9 @@ module.exports = (core, config) => ({
 
   logout: (req, res) => {
     return Promise.resolve(true);
+  },
+
+  register: (req, res) => {
+    return Promise.reject(new Error('Registration not available'));
   }
 });
