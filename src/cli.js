@@ -64,9 +64,8 @@ const createOptions = options => {
     npm: path.resolve(options.root, 'package.json'),
     packages: path.resolve(options.root, 'packages.json'),
     config: {
-      discover: [
-        path.resolve(options.root, 'node_modules')
-      ]
+      discover: [],
+      disabled: []
     },
     dist: () => {
       const root = commander.dist ? path.resolve(commander.dist) : path.resolve(options.root, 'dist');
@@ -81,14 +80,6 @@ const createOptions = options => {
       };
     }
   }, options);
-};
-
-const createDiscoveryPaths = (options, config) => {
-  return [
-    ...config.discover || [],
-    ...options.config.discover
-  ]
-    .map(d => path.resolve(d));
 };
 
 const cli = async (argv, opts) => {
@@ -108,20 +99,25 @@ const cli = async (argv, opts) => {
   const options = createOptions(opts);
   const loadFile = path.resolve(options.cli, 'index.js');
 
-  let tasks = [];
   if (fs.existsSync(loadFile)) {
     try {
-      const config = require(loadFile);
+      const include = require(loadFile);
+      const config = Object.assign({
+        discover: [
+          path.resolve(options.root, 'node_modules')
+        ]
+      }, options.config, include);
 
-      options.config.discover = createDiscoveryPaths(options, config);
-      options.config.disabled = config.disabled || [];
+      options.config = config;
+      options.config.discover = options.config.discover
+        .map(d => path.resolve(d));
     } catch (e) {
       consola.warn('An error occured while loading cli config');
       consola.fatal(new Error(e));
     }
   }
 
-  loadTasks(tasks, options)
+  loadTasks(options.config.tasks, options)
     .then(tasks => {
       Object.keys(tasks).forEach(name => {
         try {
