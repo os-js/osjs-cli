@@ -1,5 +1,12 @@
 # Changelog for osjs-cli
 
+## 3.0.17
+
+* Added support for overriding package metadata
+* Cleaned up discover task
+* Refactored initial config loading
+* Remove deprecated cli config lookup
+
 ## 3.0.16
 
 * Updated dependencies
