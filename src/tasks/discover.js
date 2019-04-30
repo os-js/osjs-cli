@@ -130,21 +130,25 @@ const action = async ({logger, options, args, commander}) => {
       .catch(err => console.warn(err));
   });
 
-  return Promise.resolve()
-    .then(() => logger.info('Flushing out old discoveries'))
-    .then(() => fs.ensureDir(dist.root))
-    .then(() => fs.ensureDir(dist.themes))
-    .then(() => fs.ensureDir(dist.packages))
-    .then(() => clean(copyFiles, dist.themes))
-    .then(() => clean(copyFiles, dist.packages))
-    .then(() => logger.info('Discovering packages'))
-    .then(() => Promise.all(discover()))
-    .then(() => fs.writeJson(discoveryDest, discovery))
-    .then(() => fs.writeJson(dist.metadata, manifest))
-    .then(() => packages.forEach(pkg => {
-      logger.log(`[${copyFiles ? 'copy' : 'symlink'}] ${pkg.json.name} as ${pkg.meta.name}`);
-    }))
-    .then(() => logger.success(packages.length + ' package(s) discovered.'));
+  logger.info('Flushing out old discoveries');
+
+  await fs.ensureDir(dist.root);
+  await fs.ensureDir(dist.themes);
+  await fs.ensureDir(dist.packages);
+  await clean(copyFiles, dist.themes);
+  await clean(copyFiles, dist.packages);
+
+  logger.info('Discovering packages');
+
+  await Promise.all(discover());
+  await fs.writeJson(discoveryDest, discovery);
+  await fs.writeJson(dist.metadata, manifest);
+
+  packages.forEach(pkg => {
+    logger.log(`[${copyFiles ? 'copy' : 'symlink'}] ${pkg.json.name} as ${pkg.meta.name}`);
+  });
+
+  logger.success(packages.length + ' package(s) discovered.');
 };
 
 module.exports = {
