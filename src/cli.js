@@ -111,16 +111,10 @@ const cli = async (argv, opts) => {
   let tasks = [];
   if (fs.existsSync(loadFile)) {
     try {
-      const c = require(loadFile);
+      const config = require(loadFile);
 
-      if (c instanceof Array) {
-        tasks = c;
-      } else {
-        tasks = c.tasks;
-
-        options.config.discover = createDiscoveryPaths(options, c);
-        options.config.disabled = c.disabled || [];
-      }
+      options.config.discover = createDiscoveryPaths(options, config);
+      options.config.disabled = config.disabled || [];
     } catch (e) {
       consola.warn('An error occured while loading cli config');
       consola.fatal(new Error(e));
