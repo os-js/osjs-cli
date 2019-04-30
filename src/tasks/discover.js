@@ -92,9 +92,22 @@ const action = async ({logger, options, args, commander}) => {
 
   const packages = found.filter(uniqueFn(true))
     .filter(removeSoftDeleted(logger, options.config.disabled));
+
   const discovery = packages.map(pkg => pkg.filename)
     .map(filename => path.relative(options.root, filename));
-  const manifest = packages.map(({meta}) => meta);
+
+  const manifest = packages.map(({meta}) => {
+    const override = options.config.metadata
+      ? options.config.metadata.override[meta.name]
+      : null;
+
+    if (override) {
+      logger.warn(`Metadata for '${meta.name}' was overridden from CLI config!`);
+    }
+
+    return Object.assign({}, meta, override || {});
+  });
+
   const discoveryDest = path.resolve(
     args.discover || options.packages
   );
