@@ -109,8 +109,10 @@ const cli = async (argv, opts) => {
       }, options.config, include);
 
       options.config = config;
-      options.config.discover = options.config.discover
-        .map(d => path.resolve(d));
+      options.config.discover = [
+        path.resolve(options.root, 'node_modules'),
+        ...options.config.discover
+      ].map(d => path.resolve(d));
     } catch (e) {
       consola.warn('An error occured while loading cli config');
       consola.fatal(new Error(e));
