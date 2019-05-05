@@ -40,6 +40,7 @@ const error = msg => {
 };
 
 const DEFAULT_TASKS = [
+  require('./tasks/info.js'),
   require('./tasks/watch.js'),
   require('./tasks/discover.js'),
   require('./tasks/scaffold.js')
@@ -119,7 +120,7 @@ const cli = async (argv, opts) => {
     }
   }
 
-  loadTasks(options.config.tasks, options)
+  return loadTasks(options.config.tasks, options)
     .then(tasks => {
       Object.keys(tasks).forEach(name => {
         try {
@@ -145,7 +146,7 @@ const cli = async (argv, opts) => {
               const logger = consola.withTag(name);
               const started = new Date();
 
-              task.action({logger, options, args, commander})
+              task.action({logger, options, args, commander, argv})
                 .then(() => {
                   const diff = new Date() - started;
                   consola.success(`Finished in ${diff}ms`);
