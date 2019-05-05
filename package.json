@@ -3,6 +3,14 @@
   "version": "3.0.18",
   "description": "OS.js v3 CLI",
   "main": "index.js",
+  "files": [
+    "bin",
+    "src",
+    "index.js",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "eslint": "eslint index.js src/**/*.js bin/*.js"
