@@ -6,5 +6,6 @@ plugins:
     enabled: true
 exclude_patterns:
   - src/tasks/watch.js
+  - src/templates
   - __tests__/**
   - __mocks__/**
