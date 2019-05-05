@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.18
+
+* Added 'info' task
+
 ## 3.0.17
 
 * Added support for overriding package metadata
