@@ -32,6 +32,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const consola = require('consola');
 const commander = require('commander');
+const getopts = require('getopts');
 const {createOptions, resolveOptions, loadTasks} = require('./utils.js');
 const {version} = require('../package.json');
 
@@ -101,9 +102,10 @@ const cli = async (argv = [], opts = {}) => {
 
           current
             .description(task.description)
-            .action((args) => {
+            .action(() => {
               const logger = consola.withTag(name);
               const started = new Date();
+              const args = getopts(process.argv.slice(2));
 
               task.action({logger, options, args, commander, argv})
                 .then(() => {
