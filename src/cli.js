@@ -31,59 +31,37 @@
 const fs = require('fs-extra');
 const path = require('path');
 const consola = require('consola');
-const {version} = require('../package.json');
 const commander = require('commander');
+const {createOptions, resolveOptions, loadTasks} = require('./utils.js');
+const {version} = require('../package.json');
+
+const DEFAULT_TASKS = {
+  ...require('./tasks/info.js'),
+  ...require('./tasks/watch.js'),
+  ...require('./tasks/discover.js'),
+  ...require('./tasks/scaffold.js')
+};
 
 const error = msg => {
   console.error(msg);
   process.exit(1);
 };
 
-const DEFAULT_TASKS = [
-  require('./tasks/info.js'),
-  require('./tasks/watch.js'),
-  require('./tasks/discover.js'),
-  require('./tasks/scaffold.js')
-].reduce((obj, result) => Object.assign({}, result, obj), {});
-
-const loadTasks = (includes, options) => {
-  const tasks = Object.assign({}, DEFAULT_TASKS);
-  const promises = includes.map(fn => fn(options));
-
-  return Promise.all(promises)
-    .then(results => {
-      return results.reduce((list, iter) => {
-        return Object.assign({}, list, iter);
-      }, tasks);
-    });
-};
-
-const createOptions = options => {
-  return Object.assign({
-    production: !!(process.env.NODE_ENV || 'development').match(/^prod/),
-    cli: path.resolve(options.root, 'src/cli'),
-    npm: path.resolve(options.root, 'package.json'),
-    packages: path.resolve(options.root, 'packages.json'),
-    config: {
-      discover: [],
-      disabled: []
-    },
-    dist: () => {
-      const root = commander.dist ? path.resolve(commander.dist) : path.resolve(options.root, 'dist');
-
-      return {
-        root,
-        themes: path.resolve(root, 'themes'),
-        sounds: path.resolve(root, 'sounds'),
-        icons: path.resolve(root, 'icons'),
-        packages: path.resolve(root, 'apps'),
-        metadata: path.resolve(root, 'metadata.json')
-      };
+const load = filename => {
+  let result = {};
+  if (fs.existsSync(filename)) {
+    try {
+      result = require(filename);
+    } catch (e) {
+      consola.warn('An error occured while loading cli config');
+      consola.fatal(new Error(e));
     }
-  }, options);
+  }
+
+  return result;
 };
 
-const cli = async (argv, opts) => {
+const cli = async (argv = [], opts = {}) => {
   commander
     .version(version)
     .option('--dist [dist]', 'Target dist directory (\'dist/\' by default)')
@@ -97,30 +75,11 @@ const cli = async (argv, opts) => {
       console.log('- https://manual.os-js.org/v3/guide/cli/');
     });
 
-  const options = createOptions(opts);
-  const loadFile = path.resolve(options.cli, 'index.js');
+  const defaults = createOptions(opts);
+  const loadFile = path.resolve(defaults.cli, 'index.js');
+  const options = resolveOptions(defaults, load(loadFile));
 
-  if (fs.existsSync(loadFile)) {
-    try {
-      const include = require(loadFile);
-      const config = Object.assign({
-        discover: [
-          path.resolve(options.root, 'node_modules')
-        ]
-      }, options.config, include);
-
-      options.config = config;
-      options.config.discover = [
-        path.resolve(options.root, 'node_modules'),
-        ...options.config.discover
-      ].map(d => path.resolve(d));
-    } catch (e) {
-      consola.warn('An error occured while loading cli config');
-      consola.fatal(new Error(e));
-    }
-  }
-
-  return loadTasks(options.config.tasks, options)
+  return loadTasks(DEFAULT_TASKS, options.config.tasks, options)
     .then(tasks => {
       Object.keys(tasks).forEach(name => {
         try {
