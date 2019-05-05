@@ -84,6 +84,32 @@ For more information about service providers, visit:
   }
 };
 
+const basicScaffoldDefaults = {
+  options: {
+    '--force': 'Force overwrite of existing target',
+    '--type': 'Script type: client, server',
+    '--filename': 'Specify name instead of using interactive wizard'
+  }
+};
+
+const forceBasicScaffold = args =>
+  args.type && args.filename
+    ? {
+      ...args,
+      target: path.join('src', args.type, args.filename),
+      confirm: true
+    }
+    : false;
+
+const forcePackageScaffold = args =>
+  args.name
+    ? {
+      ...args,
+      target: path.join('src', 'packages', args.name),
+      confirm: true
+    }
+    : false;
+
 const ask = (type, s) => inquirer.prompt([{
   name: 'type',
   message: `Select ${s.title} type`,
@@ -149,12 +175,14 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
           .then(raw => raw.replace(/___NAME___/g, name))
           .then(contents => fs.writeFile(destination, contents))
           .then(() => {
-            logger.success('Wrote', filename);
+            logger.success('Wrote', destination.replace(options.root, ''));
           });
       });
   });
 
-  const choices = await inquirer.prompt([{
+  const force = forcePackageScaffold(args);
+
+  const choices = force ? force : await inquirer.prompt([{
     name: 'name',
     message: 'Enter name of package ([A-z0-9_])',
     default: defaultName,
@@ -188,12 +216,11 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
     return Promise.resolve(true);
   }
 
-
   const destination = path.resolve(options.root, choices.target);
   const exists = await fs.exists(destination);
   let replace = true;
 
-  if (exists) {
+  if (exists && !args.force) {
     logger.warn('Target directory already exists');
 
     const {overwrite} = await inquirer.prompt([{
@@ -217,15 +244,14 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
     replace = a.replace;
   }
 
-
   await fs.ensureDir(destination);
 
   return Promise.all(promises(choices.name, destination, replace))
     .then(() => logger.info('Running "npm install"'))
-    .then(() => utils.spawnAsync(npmBinary, ['install'], {cwd: destination}))
+    .then(() => args.dry ? false : utils.spawnAsync(npmBinary, ['install'], {cwd: destination}))
     .then(() => logger.success('...dependencies installed'))
     .then(() => logger.info('Running "npm run build"'))
-    .then(() => utils.spawnAsync(npmBinary, ['run', 'build'], {cwd: destination}))
+    .then(() => args.dry ? false : utils.spawnAsync(npmBinary, ['run', 'build'], {cwd: destination}))
     .then(() => logger.success('...build complete'))
     .then(() => {
       logger.info('Package was generated and built.');
@@ -246,7 +272,8 @@ const scaffoldBasic = type => async ({logger, options, args}) => {
   logger.info('Scaffolding', type);
 
   const s = scaffolds[type];
-  const choices = await ask(type, s);
+  const forced = forceBasicScaffold(args);
+  const choices = forced ? forced : await ask(type, s);
 
   if (!choices.confirm) {
     logger.info('Scaffolding aborted...');
@@ -265,7 +292,7 @@ const scaffoldBasic = type => async ({logger, options, args}) => {
   );
 
   const exists = await fs.exists(destination);
-  if (exists) {
+  if (exists && !args.force) {
     throw new Error('Destination already exists!');
   }
 
@@ -282,26 +309,40 @@ const scaffoldBasic = type => async ({logger, options, args}) => {
 module.exports = {
   'make:auth': {
     description: 'Create Authentication adapter script',
-    action: scaffoldBasic('auth')
+    action: scaffoldBasic('auth'),
+    ...basicScaffoldDefaults
   },
   'make:settings': {
     description: 'Create Settings adapter script',
-    action: scaffoldBasic('settings')
+    action: scaffoldBasic('settings'),
+    ...basicScaffoldDefaults
   },
   'make:provider': {
     description: 'Create Service provider script',
-    action: scaffoldBasic('providers')
+    action: scaffoldBasic('providers'),
+    ...basicScaffoldDefaults
   },
   'make:vfs': {
     description: 'Create VFS adapter script',
-    action: scaffoldBasic('vfs')
+    action: scaffoldBasic('vfs'),
+    ...basicScaffoldDefaults
   },
   'make:application': {
     description: 'Create Application package',
+    options: {
+      '--force': 'Force overwrite of existing package',
+      '--dry': 'Skip npm scripts',
+      '--name': 'Specify name instead of using wizard'
+    },
     action: scaffoldPackage('application')
   },
   'make:iframe-application': {
     description: 'Create IFrame Application package',
+    options: {
+      '--force': 'Force overwrite of existing package',
+      '--dry': 'Skip npm scripts',
+      '--name': 'Specify name instead of using interactive wizard'
+    },
     action: scaffoldPackage('iframe-application')
   },
   'create:package': {
