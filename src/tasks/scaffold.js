@@ -343,12 +343,5 @@ module.exports = {
       '--name': 'Specify name instead of using interactive wizard'
     },
     action: scaffoldPackage('iframe-application')
-  },
-  'create:package': {
-    description: '[deprecated] Creates a new package',
-    action: ({logger, options, args}) => {
-      logger.warn('The task \'create:package\' is deprecated, please use \'make*\' tasks instead');
-      return scaffoldPackage('application')({logger, options, args});
-    }
   }
 };
