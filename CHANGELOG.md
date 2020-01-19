@@ -1,5 +1,24 @@
 # Changelog for osjs-cli
 
+## 3.0.19
+
+* Updated .travis.yml
+* Updated package.json scripts
+* Updated linter configurations in application templates
+* Updated dependencies
+* Updated application template dotfiles
+* Updated application template dependencies
+* Updated eslint rules
+* Updated README badges
+* Updated codeclimate ignores
+* Updated package.json files section
+* Removed unused watch:all task
+* Removed deprecated 'make:package' task
+* Added unit tests
+* Scaffold tasks can now be done without interactive wizard
+* Updated 'args' passed to tasks
+* Split up some source code
+
 ## 3.0.18
 
 * Added 'info' task
