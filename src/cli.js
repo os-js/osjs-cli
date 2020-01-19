@@ -38,7 +38,7 @@ const {version} = require('../package.json');
 
 const DEFAULT_TASKS = {
   ...require('./tasks/info.js'),
-  ...require('./tasks/watch.js'),
+  // ...require('./tasks/watch.js'),
   ...require('./tasks/discover.js'),
   ...require('./tasks/scaffold.js')
 };
