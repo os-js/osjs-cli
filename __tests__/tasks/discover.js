@@ -5,6 +5,7 @@ const fs = require('fs-extra');
 const utils = require('../../src/utils.js');
 const task = require('../../src/tasks/discover.js');
 
+// FIXME: Memory fs
 describe('task > package:discover', () => {
   const root = temp.mkdirSync('osjs-cli-jest');
   const fname = str => path.resolve(root, str);

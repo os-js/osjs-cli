@@ -106,7 +106,7 @@ describe('task > make:*', () => {
       });
 
       expect(fs.readdirSync(fname('src/packages/StandardApplication')))
-        .toHaveLength(7);
+        .toHaveLength(6);
     });
   });
 
@@ -120,7 +120,7 @@ describe('task > make:*', () => {
       });
 
       expect(fs.readdirSync(fname('src/packages/IframeApplication')))
-        .toHaveLength(6);
+        .toHaveLength(5);
     });
   });
 });
