@@ -1,12 +1,12 @@
 {
   "name": "___NAME___",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "eslint": "eslint *.js",
+    "test": "npm run eslint && npm run stylelint",
     "build": "webpack",
     "watch": "webpack --watch",
-    "stylelint": "stylelint index.scss src/**/*.scss",
-    "prepublishOnly": "npm run eslint && npm run stylelint && rm ./dist/* && npm run build"
+    "eslint": "eslint index.js server.js",
+    "stylelint": "stylelint index.scss",
+    "prepublishOnly": "npm run test && rm ./dist/* && npm run build"
   },
   "dependencies": {},
   "devDependencies": {
@@ -14,6 +14,8 @@
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.2.3",
     "@babel/runtime": "^7.2.0",
+    "@osjs/eslint-config": "^1.0.2",
+    "@osjs/stylelint-config": "^1.0.1",
     "babel-loader": "^8.0.5",
     "css-loader": "^3.4.2",
     "eslint": "^6.8.0",
@@ -22,10 +24,21 @@
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "sass-loader": "^8.0.2",
     "stylelint": "^13.0.0",
-    "stylelint-config-standard": "^19.0.0",
-    "stylelint-scss": "^3.5.1",
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.1"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "extends": "@osjs/eslint-config"
+  },
+  "stylelint": {
+    "extends": "@osjs/stylelint-config"
   },
   "babel": {
     "presets": [
