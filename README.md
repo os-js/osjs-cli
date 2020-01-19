@@ -16,7 +16,7 @@
 
 # OS.js v3 CLI Module
 
-This is the node module required to build OS.js and any of its packages, themes, etc.
+This is the CLI module for OS.js. Runs common tasks for managing an installation.
 
 ## Contribution
 
