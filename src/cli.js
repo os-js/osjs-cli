@@ -119,6 +119,10 @@ const cli = async (argv = [], opts = {}) => {
         }
       });
 
+      if (process.env.NODE_ENV === 'test') {
+        return;
+      }
+
       if (argv.length < 3) {
         commander.help();
         process.exit(1);
