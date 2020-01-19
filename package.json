@@ -12,7 +12,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "npm run eslint && jest",
+    "test": "npm run eslint && npm run jest",
+    "jest": "jest",
     "eslint": "eslint index.js 'src/**/*.js' 'bin/*.js'",
     "prepublishOnly": "npm run test"
   },
