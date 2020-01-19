@@ -30,19 +30,18 @@
     "node": ">=8.0"
   },
   "dependencies": {
-    "commander": "^2.20.0",
-    "consola": "^2.6.0",
-    "fs-extra": "^7.0.1",
-    "getopts": "^2.2.4",
-    "globby": "^9.2.0",
+    "commander": "^4.1.0",
+    "consola": "^2.11.3",
+    "fs-extra": "^8.1.0",
+    "getopts": "^2.2.5",
+    "globby": "^11.0.0",
     "inquirer": "^6.3.1",
-    "temp": "^0.9.0",
-    "webpack": "^4.30.0",
-    "which": "^1.3.1"
+    "temp": "^0.9.1",
+    "which": "^2.0.2"
   },
   "devDependencies": {
-    "@osjs/eslint-config": "^1.0.0",
-    "eslint": "^5.16.0"
+    "@osjs/eslint-config": "^1.0.2",
+    "eslint": "^6.8.0"
   },
   "author": "Anders Evenrud <andersevenrud@gmail.com>",
   "license": "BSD-2-Clause",

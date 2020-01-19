@@ -35,7 +35,7 @@ const {spawn} = require('child_process');
 const commander = require('commander');
 
 const npmPackages = async (root) => {
-  const globs = await globby(root + '/**/package.json', {deep: 2});
+  const globs = await globby(root + '/**/package.json', {deep: 3});
   const metafilename = dir => path.resolve(dir, 'metadata.json');
 
   const promises = globs.map(filename => fs.readJson(filename)

@@ -35,7 +35,7 @@ const globby = require('globby');
 const isSymlink = file => fs.lstat(file)
   .then(stat => stat.isSymbolicLink());
 
-const clean = (copyFiles, dir) => globby(dir, {deep: false, onlyDirectories: true})
+const clean = (copyFiles, dir) => globby(dir, {deep: 1, onlyDirectories: true})
   .then(files => Promise.all(files.map(file => {
     return isSymlink(file)
       .then(sym => {
