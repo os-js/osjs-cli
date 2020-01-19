@@ -49,5 +49,30 @@
   "bugs": {
     "url": "https://github.com/os-js/osjs-cli/issues"
   },
-  "homepage": "https://github.com/os-js/osjs-cli#readme"
+  "homepage": "https://github.com/os-js/osjs-cli#readme",
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaVersion": 2018,
+      "ecmaFeatures": {
+        "experimentalObjectRestSpread": true
+      }
+    },
+    "extends": "@osjs/eslint-config"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageReporters": ["lcov"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/__mocks__/setup.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "src/tasks/watch.js",
+      "/node_modules/"
+    ]
+  }
 }
