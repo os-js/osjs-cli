@@ -27,6 +27,14 @@
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.1"
   },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ],
+    "plugins": [
+      "@babel/plugin-transform-runtime"
+    ]
+  },
   "osjs": {
     "type": "package"
   }

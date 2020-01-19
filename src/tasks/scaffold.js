@@ -147,7 +147,6 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
     : ['server.js', 'index.scss'];
 
   const files = [
-    '.babelrc',
     'index.js',
     'webpack.config.js',
     'package.json',
