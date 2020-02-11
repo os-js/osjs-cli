@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.21
+
+* Fixed package discovery on Windows (#12)
+
 ## 3.0.19
 
 * Updated .travis.yml
