@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.23
+
+* Some improvements to package discovery
+
 ## 3.0.22
 
 * Now using @osjs/dev-meta in templates
