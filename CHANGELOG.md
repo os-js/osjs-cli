@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.22
+
+* Now using @osjs/dev-meta in templates
+
 ## 3.0.21
 
 * Fixed package discovery on Windows (#12)
