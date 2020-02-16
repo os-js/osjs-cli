@@ -30,12 +30,32 @@
 const utils = require('../utils.js');
 const path = require('path');
 const fs = require('fs-extra');
-const globby = require('globby');
 
 const isSymlink = file => fs.lstat(file)
   .then(stat => stat.isSymbolicLink());
 
-const clean = (copyFiles, dir) => globby(dir, {deep: 1, onlyDirectories: true})
+const glob = async (dir) => {
+  const stat = async (f) => {
+    const d = path.resolve(dir, f);
+
+    try {
+      const s = await fs.lstat(d);
+      if (s.isSymbolicLink() || s.isDirectory()) {
+        return d;
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+
+    return null;
+  };
+
+  const files = await fs.readdir(dir);
+  const result = await Promise.all(files.map(stat));
+  return result.filter(f => !!f);
+};
+
+const clean = async (copyFiles, dir) => glob(dir)
   .then(files => Promise.all(files.map(file => {
     return isSymlink(file)
       .then(sym => {
@@ -46,9 +66,27 @@ const clean = (copyFiles, dir) => globby(dir, {deep: 1, onlyDirectories: true})
       });
   })));
 
-const getAllPackages = dirs => Promise.all(dirs.map(dir => {
-  return utils.npmPackages(dir);
-})).then(results => [].concat(...results));
+const getAllPackages = async (logger, dirs) => {
+  const result = [];
+  for (let i = 0; i < dirs.length; i++) {
+    result.push(await utils.npmPackages(dirs[i]));
+  }
+
+  const packages = [];
+  const exists = name => packages
+    .find(iter => iter.meta.name === name);
+
+  for (let i = result.length - 1; i >= 0; i--) {
+    const group = result[i];
+    for (let j = 0; j < group.length; j++) {
+      if (!exists(group[j].meta.name)) {
+        packages.push(group[j]);
+      }
+    }
+  }
+
+  return packages;
+};
 
 const removeSoftDeleted = (logger, disabled) => iter => {
   if (disabled.indexOf(iter.meta.name) !== -1) {
@@ -69,28 +107,22 @@ const removeSoftDeleted = (logger, disabled) => iter => {
   return true;
 };
 
-const uniqueFn = condition => (value, index, arr) => {
-  const result = arr.findIndex(iter => {
-    return iter.meta.name === value.meta.name;
-  }) === index;
-
-  return condition ? result : !result;
-};
-
 const action = async ({logger, options, args, commander}) => {
   const dist = options.dist();
   const copyFiles = args.copy === true;
   const relativeSymlinks = !copyFiles && args.relative === true;
-  const found = await getAllPackages(options.config.discover);
+  const discoveryDest = path.resolve(args.discover || options.packages);
 
-  const dupes = found.filter(uniqueFn(false));
-  if (dupes.length > 0) {
-    logger.warn('Duplicate packages were discovered!');
-    logger.log(`A total of ${dupes.length} duplicates:`);
-    dupes.forEach(pkg => logger.log(` > ${pkg.meta.name}`));
-  }
+  logger.info('Discovering packages...');
+  logger.info('Destination discovery map', discoveryDest);
+  logger.info('Destination path', dist.root);
+  logger.info('Destination manifest', dist.metadata);
 
-  const packages = found.filter(uniqueFn(true))
+  options.config.discover.forEach(d => logger.info('Including', d));
+
+  const found = await getAllPackages(logger, options.config.discover);
+
+  const packages = found
     .filter(removeSoftDeleted(logger, options.config.disabled));
 
   const discovery = packages.map(pkg => pkg.filename)
@@ -107,16 +139,6 @@ const action = async ({logger, options, args, commander}) => {
 
     return Object.assign({}, meta, override || {});
   });
-
-  const discoveryDest = path.resolve(
-    args.discover || options.packages
-  );
-
-  logger.info('Destination discovery map', discoveryDest);
-  logger.info('Destination path', dist.root);
-  logger.info('Destination manifest', dist.metadata);
-
-  options.config.discover.forEach(d => logger.info('Including', d));
 
   const roots = {
     theme: dist.themes,
@@ -143,7 +165,14 @@ const action = async ({logger, options, args, commander}) => {
       .catch(err => console.warn(err));
   });
 
-  logger.info('Flushing out old discoveries');
+  packages.forEach(pkg => {
+    const type = pkg.filename.match(/node_modules/) ? 'npm' : 'local';
+    const method = copyFiles ? 'copy' : 'symlink';
+    logger.log(`- ${pkg.json.name} as ${pkg.meta.name} [${method}, ${type}]`);
+  });
+
+
+  logger.info('Flushing out old discoveries...');
 
   await fs.ensureDir(dist.root);
   await fs.ensureDir(dist.themes);
@@ -151,15 +180,11 @@ const action = async ({logger, options, args, commander}) => {
   await clean(copyFiles, dist.themes);
   await clean(copyFiles, dist.packages);
 
-  logger.info('Discovering packages');
+  logger.info('Placing packages in dist...');
 
   await Promise.all(discover());
   await fs.writeJson(discoveryDest, discovery);
   await fs.writeJson(dist.metadata, manifest);
-
-  packages.forEach(pkg => {
-    logger.log(`[${copyFiles ? 'copy' : 'symlink'}] ${pkg.json.name} as ${pkg.meta.name}`);
-  });
 
   logger.success(packages.length + ' package(s) discovered.');
 };
