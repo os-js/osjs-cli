@@ -1,6 +1,0 @@
-version: 2
-exclude_patterns:
-  - src/tasks/watch.js
-  - src/templates
-  - __tests__/**
-  - __mocks__/**
