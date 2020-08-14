@@ -1,5 +1,12 @@
 # Changelog for osjs-cli
 
+## 3.0.25 - 2020-08-15
+
+* Updated dependencies
+* Updated README
+* Updated application scaffold template
+* Added timestamps to CHANGELOG.md
+
 ## 3.0.23 - 2020-02-16
 
 * Some improvements to package discovery
