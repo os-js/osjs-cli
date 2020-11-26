@@ -1,5 +1,3 @@
-
-// Methods OS.js server requires
 module.exports = (core, proc) => {
   const {routeAuthenticated} = core.make('osjs/express');
 

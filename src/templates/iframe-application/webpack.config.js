@@ -6,17 +6,21 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
   mode,
   devtool: 'source-map',
-  entry: path.resolve(__dirname, 'index.js'),
+  entry: [
+    path.resolve(__dirname, 'index.js'),
+  ],
+  optimization: {
+    minimize,
+  },
   externals: {
     osjs: 'OSjs'
   },
-  optimization: {
-    minimize
-  },
   plugins: [
-    new CopyWebpackPlugin([
-      {from: 'data', to: 'data'}
-    ])
+    new CopyWebpackPlugin({
+      patterns: [
+        {from: 'data', to: 'data'}
+      ]
+    })
   ],
   module: {
     rules: [
