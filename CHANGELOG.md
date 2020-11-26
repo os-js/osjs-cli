@@ -1,5 +1,10 @@
 # Changelog for osjs-cli
 
+## 3.0.26 - 2020-11-26
+
+* Updated application examples
+* Updated dependencies
+
 ## 3.0.25 - 2020-08-15
 
 * Updated dependencies
