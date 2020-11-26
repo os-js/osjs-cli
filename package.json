@@ -1,7 +1,7 @@
 {
   "name": "@osjs/cli",
   "version": "3.0.25",
-  "description": "OS.js v3 CLI",
+  "description": "OS.js CLI",
   "main": "index.js",
   "files": [
     "bin",
@@ -34,16 +34,16 @@
   "dependencies": {
     "commander": "^4.1.1",
     "consola": "^2.15.0",
-    "fs-extra": "^8.1.0",
+    "fs-extra": "^9.0.1",
     "getopts": "^2.2.5",
     "globby": "^11.0.1",
-    "inquirer": "^6.3.1",
-    "temp": "^0.9.1",
+    "inquirer": "^7.3.3",
+    "temp": "^0.9.4",
     "which": "^2.0.2"
   },
   "devDependencies": {
-    "@osjs/eslint-config": "^1.1.0",
-    "eslint": "^6.8.0"
+    "@osjs/eslint-config": "^2.0.1",
+    "eslint": "^7.14.0"
   },
   "author": "Anders Evenrud <andersevenrud@gmail.com>",
   "license": "BSD-2-Clause",
