@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.0.27 - 2020-02-11
+
+* Updated templates ES style
+
 ## 3.0.26 - 2020-11-26
 
 * Updated application examples
