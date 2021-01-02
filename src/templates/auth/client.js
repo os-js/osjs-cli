@@ -1,17 +1,17 @@
 
 const myAdapter = (core, config) => ({
-  login: values => {
+  async login(values) {
     // You can transform the form values from login here if you want
-    return Promise.resolve(values);
+    return values;
   },
 
-  logout: () => {
+  async logout() {
     // And perform special operations on logout
-    return Promise.resolve(true);
+    return true;
   },
 
-  register: values => {
-    return Promise.reject(new Error('Registration not available'));
+  async register(values) {
+    throw new Error('Registration not available');
   }
 });
 

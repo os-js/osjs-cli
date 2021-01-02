@@ -1,6 +1,6 @@
 
 const myAdapter = (core) => ({
-  readdir: (path, options) => Promise.resolve([])
+  readdir: async (path, options) => ([])
 });
 
 export default myAdapter;

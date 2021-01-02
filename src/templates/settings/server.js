@@ -1,12 +1,12 @@
 
 module.exports = (core, options) => ({
   // req.body has all settings from client
-  save: (req, res) => {
-    return Promise.resolve(true);
+  async save(req, res) {
+    return true;
   },
 
   // return all settings for user here
-  load: (req, res) => {
-    return Promise.resolve({});
+  async load(req, res) {
+    return {};
   }
 });

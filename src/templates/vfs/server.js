@@ -1,4 +1,4 @@
 
 module.exports = (core) => ({
-  readdir: vfs => (path) => Promise.resolve([])
+  readdir: vfs => async (path) => ([])
 });
