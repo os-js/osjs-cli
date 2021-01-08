@@ -3,7 +3,7 @@ module.exports = (core, proc) => {
 
   return {
     // When server initializes
-    init: async () => {
+    async init() {
       // HTTP Route example (see index.js)
       routeAuthenticated('POST', proc.resource('/test'), (req, res) => {
         res.json({hello: 'World'});
@@ -17,13 +17,15 @@ module.exports = (core, proc) => {
     },
 
     // When server starts
-    start: () => {},
+    async start() {
+    },
 
     // When server goes down
-    destroy: () => {},
+    destroy() {
+    },
 
     // When using an internally bound websocket, messages comes here
-    onmessage: (ws, respond, args) => {
+    onmessage(ws, respond, args) {
       respond('Pong');
     }
   };
