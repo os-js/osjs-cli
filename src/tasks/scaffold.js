@@ -170,9 +170,11 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
           return true;
         }
 
+        const binary = filename.match(/\.png$/);
+
         return fs.ensureDir(path.dirname(destination))
-          .then(() => fs.readFile(source, 'utf8'))
-          .then(raw => raw.replace(/___NAME___/g, name))
+          .then(() => fs.readFile(source, binary ? null : 'utf8'))
+          .then(raw => binary ? raw : raw.replace(/___NAME___/g, name))
           .then(contents => fs.writeFile(destination, contents))
           .then(() => {
             logger.success('Wrote', destination.replace(options.root, ''));
