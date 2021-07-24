@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.1.3 - 2021-07-24
+
+* Fixed broken binaries in scaffolding
+
 ## 3.1.2 - 2021-07-24
 
 * Updated scaffolding task file list
