@@ -147,6 +147,7 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
     : ['server.js', 'index.scss'];
 
   const files = [
+    'icon.png',
     'index.js',
     'webpack.config.js',
     'package.json',
