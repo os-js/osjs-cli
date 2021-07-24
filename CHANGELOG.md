@@ -1,5 +1,9 @@
 # Changelog for osjs-cli
 
+## 3.1.1 - 2021-07-24
+
+* Re-released with removed artifacts
+
 ## 3.1.0 - 2021-07-24
 
 * Added icons to app templates
