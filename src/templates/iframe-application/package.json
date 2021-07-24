@@ -9,7 +9,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@osjs/dev-meta": "^2.0.0"
+    "@osjs/dev-meta": "^2.1.0"
   },
   "eslintConfig": {
     "env": {
