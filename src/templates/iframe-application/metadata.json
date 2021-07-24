@@ -1,6 +1,7 @@
 {
   "type": "application",
   "name": "___NAME___",
+  "icon": "icon.png",
   "category": null,
   "server": null,
   "title": {

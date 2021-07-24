@@ -3,6 +3,7 @@
   "name": "___NAME___",
   "category": null,
   "server": "server.js",
+  "icon": "icon.png",
   "title": {
     "en_EN": "___NAME___"
   },
