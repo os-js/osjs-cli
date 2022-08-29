@@ -38,7 +38,7 @@ const isWindows = /^win/.test(process.platform);
 const npmBinary = isWindows ? 'npm.cmd' : 'npm';
 
 const filterInput = input => String(input)
-  .replace(/[^A-z0-9_]/g, '')
+  .replace(/[^A-z0-9_@/]/g, '')
   .trim();
 
 const scaffolds = {
@@ -186,7 +186,7 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
 
   const choices = force ? force : await inquirer.prompt([{
     name: 'name',
-    message: 'Enter name of package ([A-z0-9_])',
+    message: 'Enter name of package ([A-z0-9_@/])',
     default: defaultName,
     filter: filterInput,
     validate: input => {
