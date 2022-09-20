@@ -42,7 +42,10 @@
     "which": "^2.0.2"
   },
   "devDependencies": {
-    "@osjs/dev-meta": "^2.2.0"
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
+    "@osjs/dev-meta": "^2.2.0",
+    "husky": "^8.0.1"
   },
   "author": "Anders Evenrud <andersevenrud@gmail.com>",
   "license": "BSD-2-Clause",
@@ -75,6 +78,11 @@
     "coveragePathIgnorePatterns": [
       "src/tasks/watch.js",
       "/node_modules/"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
     ]
   }
 }
