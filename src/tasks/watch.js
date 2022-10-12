@@ -106,7 +106,7 @@ const wlog = (logger, cb) => (err, status) => {
 };
 
 
-const action = async ({logger, options, args}) => {
+const action = async ({logger, options}) => {
   logger.info('Looking up npm packages...');
 
   const print = list => {

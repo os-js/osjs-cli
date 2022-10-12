@@ -55,7 +55,7 @@ const glob = async (dir) => {
   return result.filter(f => !!f);
 };
 
-const clean = async (copyFiles, dir) => glob(dir)
+const clean = async (dir) => glob(dir)
   .then(files => Promise.all(files.map(file => {
     return isSymlink(file)
       .then(sym => {
@@ -66,7 +66,7 @@ const clean = async (copyFiles, dir) => glob(dir)
       });
   })));
 
-const getAllPackages = async (logger, dirs) => {
+const getAllPackages = async (dirs) => {
   const result = [];
   for (let i = 0; i < dirs.length; i++) {
     result.push(await utils.npmPackages(dirs[i]));
@@ -107,7 +107,7 @@ const removeSoftDeleted = (logger, disabled) => iter => {
   return true;
 };
 
-const action = async ({logger, options, args, commander}) => {
+const action = async ({logger, options, args}) => {
   const dist = options.dist();
   const copyFiles = args.copy === true;
   const relativeSymlinks = !copyFiles && args.relative === true;
@@ -120,7 +120,7 @@ const action = async ({logger, options, args, commander}) => {
 
   options.config.discover.forEach(d => logger.info('Including', d));
 
-  const found = await getAllPackages(logger, options.config.discover);
+  const found = await getAllPackages(options.config.discover);
 
   const packages = found
     .filter(removeSoftDeleted(logger, options.config.disabled));
@@ -177,8 +177,8 @@ const action = async ({logger, options, args, commander}) => {
   await fs.ensureDir(dist.root);
   await fs.ensureDir(dist.themes);
   await fs.ensureDir(dist.packages);
-  await clean(copyFiles, dist.themes);
-  await clean(copyFiles, dist.packages);
+  await clean(dist.themes);
+  await clean(dist.packages);
 
   logger.info('Placing packages in dist...');
 
