@@ -73,7 +73,7 @@ const cli = async (argv = [], opts = {}) => {
     .on('--help', () => {
       console.log('');
       console.log('More information:');
-      console.log('- https://manual.os-js.org/v3/guide/cli/');
+      console.log('- https://manual.os-js.org/guide/cli/');
     });
 
   const defaults = createOptions(opts);
