@@ -47,9 +47,9 @@ const scaffolds = {
     title: 'Authentication Adapter',
     info: `
 For more information about authentication adapters, visit:
-- https://manual.os-js.org/v3/tutorial/auth/
-- https://manual.os-js.org/v3/guide/auth/
-- https://manual.os-js.org/v3/development/
+- https://manual.os-js.org/tutorial/auth/
+- https://manual.os-js.org/guide/auth/
+- https://manual.os-js.org/development/
 `
   },
   settings: {
@@ -57,9 +57,9 @@ For more information about authentication adapters, visit:
     title: 'Settings Adapter',
     info: `
 For more information about settings adapters, visit:
-- https://manual.os-js.org/v3/tutorial/settings/
-- https://manual.os-js.org/v3/guide/settings/
-- https://manual.os-js.org/v3/development/
+- https://manual.os-js.org/tutorial/settings/
+- https://manual.os-js.org/guide/settings/
+- https://manual.os-js.org/development/
 `
   },
   vfs: {
@@ -67,9 +67,9 @@ For more information about settings adapters, visit:
     title: 'VFS Adapter',
     info: `
 For more information about vfs adapters, visit:
-- https://manual.os-js.org/v3/tutorial/vfs/
-- https://manual.os-js.org/v3/guide/filesystem/
-- https://manual.os-js.org/v3/development/
+- https://manual.os-js.org/tutorial/vfs/
+- https://manual.os-js.org/guide/filesystem/
+- https://manual.os-js.org/development/
 `
   },
   providers: {
@@ -77,9 +77,9 @@ For more information about vfs adapters, visit:
     title: 'Service Provider',
     info: `
 For more information about service providers, visit:
-- https://manual.os-js.org/v3/tutorial/provider/
-- https://manual.os-js.org/v3/guide/provider/
-- https://manual.os-js.org/v3/development/
+- https://manual.os-js.org/tutorial/provider/
+- https://manual.os-js.org/guide/provider/
+- https://manual.os-js.org/development/
 `
   }
 };
@@ -262,10 +262,10 @@ const scaffoldPackage = type => async ({logger, options, args}) => {
       console.log(`
 For more information about packages, visit:
 
-- https://manual.os-js.org/v3/resource/overview/
-- https://manual.os-js.org/v3/tutorial/theme/
-- https://manual.os-js.org/v3/development/
-- https://manual.os-js.org/v3/tutorial/iframe/
+- https://manual.os-js.org/resource/overview/
+- https://manual.os-js.org/tutorial/theme/
+- https://manual.os-js.org/development/
+- https://manual.os-js.org/tutorial/iframe/
       `);
     });
 };
