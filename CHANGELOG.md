@@ -1,5 +1,22 @@
 # Changelog for osjs-cli
 
+## 3.2.0 - 2023-03-21
+
+* fix(scaffold): incorrect links in generated files (#22)
+* refactor: remove unused arguments (#17)
+* ci: add husky pre-commit hook
+* ci: add commitlint workflow
+* ci: add husky and commit checks
+* ci: update actions
+* Scoped package support (#16)
+* Remove defunct jest CI installation
+* Update 'npm install' to 'npm ci' in CI
+* Remove global npm install from test CI
+* Update dependencies
+* Update source code license comments
+* Update CI tests
+* Update LICENSE
+
 ## 3.1.3 - 2021-07-24
 
 * Fixed broken binaries in scaffolding
